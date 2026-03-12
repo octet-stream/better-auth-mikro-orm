@@ -8,7 +8,7 @@ import * as entities from "../fixtures/entities/better-auth-test-suite.js"
 import {mikroOrmAdapter} from "../../src/adapter.js"
 import {createOrm} from "../fixtures/orm.js"
 
-const orm = createOrm({
+const orm = await createOrm({
   entities: Object.values(entities),
   refreshOnEachTest: false
 })

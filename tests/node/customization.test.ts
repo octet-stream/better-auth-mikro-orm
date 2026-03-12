@@ -9,7 +9,7 @@ import type {UserInput} from "../utils/types.js"
 
 suite("custom entity (model) names", async () => {
   const entities = await import("../fixtures/entities/custom-entity-name.js")
-  const orm = createOrm({
+  const orm = await createOrm({
     entities: Object.values(entities)
   })
 
@@ -35,7 +35,7 @@ suite("custom entity (model) names", async () => {
 suite("custom field names", () => {
   suite("camelCase", async () => {
     const entities = await import("../fixtures/entities/custom-field-name.js")
-    const orm = createOrm({entities: Object.values(entities)})
+    const orm = await createOrm({entities: Object.values(entities)})
 
     test("with camelCase", async () => {
       const randomUsers = createRandomUsersUtils(orm)
@@ -63,9 +63,9 @@ suite("custom field names", () => {
       "../fixtures/entities/custom-field-name-snake-case.js"
     )
 
-    const orm = createOrm({entities: Object.values(entities)})
+    const orm = await createOrm({entities: Object.values(entities)})
 
-    test("with sname_case", async () => {
+    test("with snake_case", async () => {
       const randomUsers = createRandomUsersUtils(orm)
       const adapter = mikroOrmAdapter(orm)({
         user: {

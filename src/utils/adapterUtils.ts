@@ -97,13 +97,13 @@ export function createAdapterUtils(orm: MikroORM): AdapterUtils {
   ) => {
     entityName = normalizeEntityName(entityName)
 
-    if (!metadata.has(entityName)) {
+    if (!metadata.getByClassName(entityName, false)) {
       createAdapterError(
         `Cannot find metadata for "${entityName}" entity. Make sure it defined and listed in your Mikro ORM config.`
       )
     }
 
-    return metadata.get(entityName)
+    return metadata.getByClassName(entityName)
   }
 
   /**

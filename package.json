@@ -62,8 +62,9 @@
     "@commitlint/config-conventional": "19.8.0",
     "@commitlint/types": "19.8.0",
     "@faker-js/faker": "9.7.0",
-    "@mikro-orm/better-sqlite": "6.4.13",
-    "@mikro-orm/core": "6.4.13",
+    "@mikro-orm/core": "^7.0.1",
+    "@mikro-orm/decorators": "^7.0.1",
+    "@mikro-orm/sqlite": "^7.0.1",
     "@types/node": "22.14.1",
     "@types/uuid": "10.0.0",
     "@vitest/coverage-v8": "3.1.1",
@@ -73,6 +74,7 @@
     "es-toolkit": "1.39.7",
     "husky": "9.1.7",
     "is-in-ci": "1.0.0",
+    "reflect-metadata": "^0.2.2",
     "tsup": "8.4.0",
     "typescript": "5.8.3",
     "uuid": "11.1.0",
@@ -82,7 +84,7 @@
     "dset": "3.1.4"
   },
   "peerDependencies": {
-    "@mikro-orm/core": "^6.0.0",
+    "@mikro-orm/core": "^7.0.0",
     "better-auth": "^1.0.0"
   }
 }

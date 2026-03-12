@@ -1,12 +1,11 @@
+import {Collection, type Opt} from "@mikro-orm/core"
 import {
-  Collection,
   Embedded,
   Entity,
   OneToMany,
-  type Opt,
   Property,
   Unique
-} from "@mikro-orm/core"
+} from "@mikro-orm/decorators/legacy"
 
 import {Base} from "../shared/Base.js"
 import {Address} from "./Address.js"

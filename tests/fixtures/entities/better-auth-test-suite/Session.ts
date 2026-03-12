@@ -1,4 +1,4 @@
-import {Entity, ManyToOne, Property, Unique} from "@mikro-orm/core"
+import {Entity, ManyToOne, Property, Unique} from "@mikro-orm/decorators/legacy"
 import type {Session as DatabaseSession} from "better-auth"
 
 import {Base} from "../shared/Base.js"
