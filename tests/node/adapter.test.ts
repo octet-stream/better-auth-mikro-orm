@@ -14,7 +14,7 @@ import type {SessionInput, UserInput} from "../utils/types.js"
 
 import * as entities from "../fixtures/entities/defaults.js"
 
-const orm = await createOrm({entities: Object.values(entities)})
+const orm = createOrm({entities: Object.values(entities)})
 
 const randomUsers = createRandomUsersUtils(orm)
 

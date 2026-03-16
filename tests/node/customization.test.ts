@@ -9,7 +9,7 @@ import type {UserInput} from "../utils/types.js"
 
 suite("custom entity (model) names", async () => {
   const entities = await import("../fixtures/entities/custom-entity-name.js")
-  const orm = await createOrm({
+  const orm = createOrm({
     entities: Object.values(entities)
   })
 

@@ -10,13 +10,13 @@ interface CreateOrmParams {
   entities: Array<EntityClass<Partial<any>> | EntitySchema<Partial<any>>>
 }
 
-export async function createOrm({
+export function createOrm({
   entities,
   refreshOnEachTest = true
-}: CreateOrmParams): Promise<MikroORM> {
+}: CreateOrmParams): MikroORM {
   const dbName = join(import.meta.dirname, `${v7()}.sqlite`)
 
-  const orm = await MikroORM.init({
+  const orm = new MikroORM({
     dbName,
     entities: entities,
     ensureDatabase: true,
