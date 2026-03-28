@@ -1,8 +1,10 @@
-import {Entity, JsonType, Property} from "@mikro-orm/better-sqlite"
-import {Base} from "../shared/Base.js"
+import {Entity, JsonType, PrimaryKey, Property} from "@mikro-orm/better-sqlite"
 
 @Entity()
-export class TestModel extends Base {
+export class TestModel {
+  @PrimaryKey({type: "string"})
+  id!: string
+
   @Property({type: JsonType})
   stringArray!: string[]
 

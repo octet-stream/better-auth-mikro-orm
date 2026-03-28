@@ -1,7 +1,7 @@
 import {Entity, Property} from "@mikro-orm/better-sqlite"
 import type {Account as DatabaseAccount} from "better-auth"
 
-import {Base} from "../shared/Base.js"
+import {Base} from "./Base.js"
 
 @Entity()
 export class Account extends Base implements Omit<DatabaseAccount, "userId"> {
