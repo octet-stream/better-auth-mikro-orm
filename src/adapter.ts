@@ -1,5 +1,8 @@
 import type {FindOptions, MikroORM} from "@mikro-orm/core"
-import {type AdapterDebugLogs, createAdapter} from "better-auth/adapters"
+import {
+  createAdapterFactory,
+  type DBAdapterDebugLogOption
+} from "better-auth/adapters"
 import {dset} from "dset"
 
 import {createAdapterUtils} from "./utils/adapterUtils.js"
@@ -10,7 +13,7 @@ export interface MikroOrmAdapterConfig {
    *
    * @default false
    */
-  debugLogs?: AdapterDebugLogs
+  debugLogs?: DBAdapterDebugLogOption
 
   /**
    * Indicates whether or not JSON is supported by target database.
@@ -40,15 +43,15 @@ export const mikroOrmAdapter = (
   orm: MikroORM,
   {debugLogs, supportsJSON = true}: MikroOrmAdapterConfig = {}
 ) =>
-  createAdapter({
+  createAdapterFactory({
     config: {
-      debugLogs,
-      supportsJSON,
       adapterId: "mikro-orm-adapter",
-      adapterName: "Mikro ORM Adapter"
+      adapterName: "Mikro ORM Adapter",
+      debugLogs,
+      supportsJSON
     },
 
-    adapter({options}) {
+    adapter() {
       const {
         getEntityMetadata,
         getFieldPath,
@@ -61,15 +64,6 @@ export const mikroOrmAdapter = (
         async create({model, data, select}) {
           const metadata = getEntityMetadata(model)
           const input = normalizeInput(metadata, data)
-
-          // Better Auth ignores `advanced.generateId` option when it's disabled, so this needs to be taken care of (for backwards compatibility)
-          if (
-            options.advanced?.generateId === false &&
-            !options.advanced?.database
-          ) {
-            Reflect.deleteProperty(input, "id")
-          }
-
           const entity = orm.em.create(metadata.class, input)
 
           await orm.em.persistAndFlush(entity)

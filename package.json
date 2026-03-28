@@ -43,7 +43,9 @@
     },
     "./package.json": "./package.json"
   },
-  "files": ["lib"],
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "build": "del-cli lib && tsup-node",
     "test": "vitest run",
@@ -55,28 +57,29 @@
     "prepare": "npx --yes is-in-ci || husky"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
+    "@better-auth/test-utils": "1.5.6",
+    "@biomejs/biome": "2.4.9",
     "@changesets/changelog-github": "0.5.1",
     "@changesets/cli": "2.29.2",
-    "@commitlint/cli": "19.8.0",
-    "@commitlint/config-conventional": "19.8.0",
-    "@commitlint/types": "19.8.0",
-    "@faker-js/faker": "9.7.0",
+    "@commitlint/cli": "20.5.0",
+    "@commitlint/config-conventional": "20.5.0",
+    "@commitlint/types": "20.5.0",
+    "@faker-js/faker": "10.4.0",
     "@mikro-orm/better-sqlite": "6.4.13",
     "@mikro-orm/core": "6.4.13",
-    "@types/node": "22.14.1",
-    "@types/uuid": "10.0.0",
-    "@vitest/coverage-v8": "3.1.1",
-    "@vitest/ui": "3.1.1",
-    "better-auth": "1.2.9",
-    "del-cli": "6.0.0",
-    "es-toolkit": "1.39.7",
+    "@types/node": "25.5.0",
+    "@types/uuid": "11.0.0",
+    "@vitest/coverage-v8": "4.1.2",
+    "@vitest/ui": "4.1.2",
+    "better-auth": "1.5.6",
+    "del-cli": "7.0.0",
+    "es-toolkit": "1.45.1",
     "husky": "9.1.7",
-    "is-in-ci": "1.0.0",
-    "tsup": "8.4.0",
-    "typescript": "5.8.3",
-    "uuid": "11.1.0",
-    "vitest": "3.1.1"
+    "is-in-ci": "2.0.0",
+    "tsup": "8.5.1",
+    "typescript": "6.0.2",
+    "uuid": "13.0.0",
+    "vitest": "4.1.2"
   },
   "dependencies": {
     "dset": "3.1.4"

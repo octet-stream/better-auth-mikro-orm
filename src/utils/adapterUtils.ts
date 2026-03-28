@@ -259,7 +259,9 @@ export function createAdapterUtils(orm: MikroORM): AdapterUtils {
         ),
         value
       }))
-      .forEach(({path, value}) => dset(result, path, value))
+      .forEach(({path, value}) => {
+        dset(result, path, value)
+      })
 
     return result
   }
@@ -353,10 +355,12 @@ export function createAdapterUtils(orm: MikroORM): AdapterUtils {
         const path = ["$and", index].concat(getFieldPath(metadata, field, true))
 
         if (operator === "in") {
-          return createWhereInClause(field, path, value, result)
+          createWhereInClause(field, path, value, result)
+
+          return
         }
 
-        return createWhereClause(path, value, "eq", result)
+        createWhereClause(path, value, "eq", result)
       })
 
     where
@@ -364,7 +368,7 @@ export function createAdapterUtils(orm: MikroORM): AdapterUtils {
       .forEach(({field, value}, index) => {
         const path = ["$and", index].concat(getFieldPath(metadata, field, true))
 
-        return createWhereClause(path, value, "eq", result)
+        createWhereClause(path, value, "eq", result)
       })
 
     return result
