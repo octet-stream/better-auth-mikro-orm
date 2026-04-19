@@ -1,5 +1,8 @@
 import type {FindOptions, MikroORM} from "@mikro-orm/core"
-import {type AdapterDebugLogs, createAdapter} from "better-auth/adapters"
+import {
+  createAdapterFactory,
+  type DBAdapterDebugLogOption
+} from "better-auth/adapters"
 import {dset} from "dset"
 
 import {createAdapterUtils} from "./utils/adapterUtils.js"
@@ -10,7 +13,7 @@ export interface MikroOrmAdapterConfig {
    *
    * @default false
    */
-  debugLogs?: AdapterDebugLogs
+  debugLogs?: DBAdapterDebugLogOption
 
   /**
    * Indicates whether or not JSON is supported by target database.
@@ -40,41 +43,37 @@ export const mikroOrmAdapter = (
   orm: MikroORM,
   {debugLogs, supportsJSON = true}: MikroOrmAdapterConfig = {}
 ) =>
-  createAdapter({
+  createAdapterFactory({
     config: {
-      debugLogs,
-      supportsJSON,
       adapterId: "mikro-orm-adapter",
-      adapterName: "Mikro ORM Adapter"
+      adapterName: "Mikro ORM Adapter",
+      debugLogs,
+      supportsJSON
     },
 
-    adapter({options}) {
+    adapter(config) {
       const {
         getEntityMetadata,
         getFieldPath,
         normalizeInput,
         normalizeOutput,
-        normalizeWhereClauses
-      } = createAdapterUtils(orm)
+        normalizeWhereClauses,
+        normalizeSelect
+      } = createAdapterUtils(orm, config)
 
       return {
         async create({model, data, select}) {
           const metadata = getEntityMetadata(model)
           const input = normalizeInput(metadata, data)
-
-          // Better Auth ignores `advanced.generateId` option when it's disabled, so this needs to be taken care of (for backwards compatibility)
-          if (
-            options.advanced?.generateId === false &&
-            !options.advanced?.database
-          ) {
-            Reflect.deleteProperty(input, "id")
-          }
-
           const entity = orm.em.create(metadata.class, input)
 
           await orm.em.flush()
 
-          return normalizeOutput(metadata, entity, select) as any
+          return normalizeOutput(
+            metadata,
+            entity,
+            normalizeSelect(model, select)
+          ) as any
         },
 
         async count({model, where}): Promise<number> {
@@ -98,10 +97,16 @@ export const mikroOrmAdapter = (
             return null
           }
 
-          return normalizeOutput(metadata, entity, select) as any
+          const result = normalizeOutput(
+            metadata,
+            entity,
+            normalizeSelect(model, select)
+          ) as any
+
+          return result
         },
 
-        async findMany({model, where, limit, offset, sortBy}) {
+        async findMany({model, where, limit, offset, sortBy, select}) {
           const metadata = getEntityMetadata(model)
 
           const options: FindOptions<any> = {
@@ -120,7 +125,12 @@ export const mikroOrmAdapter = (
             options
           )
 
-          return rows.map(row => normalizeOutput(metadata, row)) as any
+          const normalizedSelect = normalizeSelect(model, select)
+          const result = rows.map(row =>
+            normalizeOutput(metadata, row, normalizedSelect)
+          ) as any
+
+          return result
         },
 
         async update({model, where, update}) {

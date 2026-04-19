@@ -1,5 +1,13 @@
 # better-auth-mikro-orm
 
+## 0.5.0
+
+### Minor Changes
+
+- [#43](https://github.com/octet-stream/better-auth-mikro-orm/pull/43) [`01b77d6`](https://github.com/octet-stream/better-auth-mikro-orm/commit/01b77d67a21162bb4151a444482bfdd09f792dd6) Thanks [@octet-stream](https://github.com/octet-stream)! - Fix support for select and multiple where clauses.
+
+- [#43](https://github.com/octet-stream/better-auth-mikro-orm/pull/43) [`23c760f`](https://github.com/octet-stream/better-auth-mikro-orm/commit/23c760fd83f865d62ea36c0d08187258179f9905) Thanks [@octet-stream](https://github.com/octet-stream)! - Support Better Auth v1.6
+
 ## 0.4.3
 
 ### Patch Changes

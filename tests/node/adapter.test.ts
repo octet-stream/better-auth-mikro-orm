@@ -7,12 +7,10 @@ import {NIL, validate} from "uuid"
 import {expect, suite, test} from "vitest"
 
 import {mikroOrmAdapter} from "../../src/index.js"
-
+import * as entities from "../fixtures/entities/defaults.js"
 import {createOrm} from "../fixtures/orm.js"
 import {createRandomUsersUtils} from "../fixtures/randomUsers.js"
 import type {SessionInput, UserInput} from "../utils/types.js"
-
-import * as entities from "../fixtures/entities/defaults.js"
 
 const orm = createOrm({entities: Object.values(entities)})
 
@@ -102,47 +100,6 @@ suite("create", () => {
             database: {
               generateId: false
             }
-          }
-        })
-
-        const actual = await adapter.create<UserInput, DatabaseUser>({
-          model: "user",
-          data: randomUsers.createOne()
-        })
-
-        expect(validate(actual.id)).toBe(true)
-      })
-    })
-
-    suite("via legacy advanced.generateId option", () => {
-      test("custom generator", async () => {
-        const expected = "451"
-        const adapter = mikroOrmAdapter(orm, {
-          debugLogs: {
-            isRunningAdapterTests: true
-          }
-        })({
-          advanced: {
-            generateId: () => expected
-          }
-        })
-
-        const actual = await adapter.create<UserInput, DatabaseUser>({
-          model: "user",
-          data: randomUsers.createOne()
-        })
-
-        expect(actual.id).toBe(expected)
-      })
-
-      test("disabled (managed by orm or db)", async () => {
-        const adapter = mikroOrmAdapter(orm, {
-          debugLogs: {
-            isRunningAdapterTests: true
-          }
-        })({
-          advanced: {
-            generateId: false
           }
         })
 

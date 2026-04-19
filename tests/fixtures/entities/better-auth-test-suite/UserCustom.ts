@@ -1,19 +1,12 @@
-import {Collection, type Opt} from "@mikro-orm/core"
-import {
-  Embedded,
-  Entity,
-  OneToMany,
-  Property,
-  Unique
-} from "@mikro-orm/decorators/legacy"
+import type {Opt} from "@mikro-orm/core"
+import {Embedded, Entity, Property, Unique} from "@mikro-orm/decorators/legacy"
 import type {User as DatabaseUser} from "better-auth"
 
 import {Address} from "./Address.js"
 import {Base} from "./Base.js"
-import {Sessions} from "./Session.js"
 
 @Entity()
-export class User extends Base implements Omit<DatabaseUser, "email"> {
+export class UserCustom extends Base implements Omit<DatabaseUser, "email"> {
   @Property({type: "string"})
   @Unique()
   email_address!: string
@@ -29,9 +22,6 @@ export class User extends Base implements Omit<DatabaseUser, "email"> {
 
   @Property({type: "string", nullable: true})
   image?: string | null | undefined
-
-  @OneToMany(() => Sessions, "user")
-  sessions = new Collection<Sessions, this>(this)
 
   @Embedded(() => Address, {object: true, nullable: true})
   address?: Address
