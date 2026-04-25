@@ -1,4 +1,5 @@
-import {Entity, type Opt, Property, Unique} from "@mikro-orm/core"
+import type {Opt} from "@mikro-orm/core"
+import {Entity, Property, Unique} from "@mikro-orm/decorators/legacy"
 import type {User as DatabaseUser} from "better-auth"
 
 import {Base} from "../shared/Base.js"

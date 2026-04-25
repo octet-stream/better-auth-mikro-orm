@@ -1,4 +1,5 @@
-import {Entity, JsonType, PrimaryKey, Property} from "@mikro-orm/better-sqlite"
+import {Entity, PrimaryKey, Property} from "@mikro-orm/decorators/legacy"
+import {JsonType} from "@mikro-orm/sqlite"
 
 @Entity()
 export class TestModel {

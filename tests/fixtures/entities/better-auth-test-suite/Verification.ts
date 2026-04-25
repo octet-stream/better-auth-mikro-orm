@@ -1,4 +1,4 @@
-import {Entity, Property} from "@mikro-orm/better-sqlite"
+import {Entity, Property} from "@mikro-orm/decorators/legacy"
 import type {Verification as DatabaseVerification} from "better-auth"
 
 import {Base} from "./Base.js"

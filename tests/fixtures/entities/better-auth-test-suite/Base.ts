@@ -1,4 +1,5 @@
-import {type Opt, PrimaryKey, Property} from "@mikro-orm/core"
+import type {Opt} from "@mikro-orm/core"
+import {PrimaryKey, Property} from "@mikro-orm/decorators/legacy"
 
 export abstract class Base {
   @PrimaryKey({type: "string"})

@@ -1,10 +1,10 @@
 import {normalTestSuite, testAdapter} from "@better-auth/test-utils/adapter"
-import {MikroORM} from "@mikro-orm/better-sqlite"
+import {MikroORM} from "@mikro-orm/sqlite"
 
 import {mikroOrmAdapter} from "../../src/adapter.js"
 import * as entities from "../fixtures/entities/better-auth-test-suite.js"
 
-const orm = MikroORM.initSync({
+const orm = await MikroORM.init({
   dbName: ":memory:",
   allowGlobalContext: true,
   entities: Object.values(entities)
@@ -18,7 +18,7 @@ const {execute} = await testAdapter({
       }
     }),
   async runMigrations() {
-    await orm.getSchemaGenerator().refreshDatabase()
+    await orm.schema.refresh()
   },
   tests: [
     normalTestSuite({

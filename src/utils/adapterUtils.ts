@@ -112,13 +112,13 @@ export function createAdapterUtils(
   ) => {
     const normalizedEntityName = normalizeEntityName(entityName)
 
-    if (!metadata.has(normalizedEntityName)) {
+    if (!metadata.getByClassName(normalizedEntityName, false)) {
       createAdapterError(
         `Cannot find metadata for "${normalizedEntityName}" entity. Make sure it defined and listed in your Mikro ORM config.`
       )
     }
 
-    return metadata.get(normalizedEntityName)
+    return metadata.getByClassName(normalizedEntityName)
   }
 
   /**

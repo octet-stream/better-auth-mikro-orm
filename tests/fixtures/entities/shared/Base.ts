@@ -1,4 +1,5 @@
-import {type Opt, PrimaryKey, Property} from "@mikro-orm/core"
+import type {Opt} from "@mikro-orm/core"
+import {PrimaryKey, Property} from "@mikro-orm/decorators/legacy"
 import {v7} from "uuid"
 
 export abstract class Base {

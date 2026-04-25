@@ -67,7 +67,7 @@ export const mikroOrmAdapter = (
           const input = normalizeInput(metadata, data)
           const entity = orm.em.create(metadata.class, input)
 
-          await orm.em.persistAndFlush(entity)
+          await orm.em.flush()
 
           return normalizeOutput(
             metadata,
@@ -176,7 +176,7 @@ export const mikroOrmAdapter = (
           )
 
           if (entity) {
-            await orm.em.removeAndFlush(entity)
+            await orm.em.remove(entity).flush()
           }
         },
 
