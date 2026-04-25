@@ -1,5 +1,11 @@
 # better-auth-mikro-orm
 
+## 1.0.0-next.0
+
+### Major Changes
+
+- [#39](https://github.com/octet-stream/better-auth-mikro-orm/pull/39) [`3aea193`](https://github.com/octet-stream/better-auth-mikro-orm/commit/3aea1939723fc6207471f9d980f3f725070e2f5a) Thanks [@stoneLeaf](https://github.com/stoneLeaf)! - Update MikroORM to v7.x
+
 ## 0.5.0
 
 ### Minor Changes
