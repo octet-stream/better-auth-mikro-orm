@@ -23,8 +23,6 @@
   "engines": {
     "node": ">= 22"
   },
-  "types": "./lib/adapter.d.cts",
-  "main": "./lib/adapter.cjs",
   "exports": {
     ".": {
       "types": "./lib/adapter.d.ts",
