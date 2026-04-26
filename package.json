@@ -66,7 +66,7 @@
     "@commitlint/types": "20.5.0",
     "@faker-js/faker": "10.4.0",
     "@mikro-orm/better-sqlite": "6.4.13",
-    "@mikro-orm/core": "6.4.13",
+    "@mikro-orm/core": "6.6.10",
     "@types/node": "25.6.0",
     "@types/uuid": "11.0.0",
     "@vitest/coverage-v8": "4.1.4",
