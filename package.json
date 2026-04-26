@@ -78,7 +78,7 @@
     "is-in-ci": "2.0.0",
     "tsup": "8.5.1",
     "typescript": "5.9.2",
-    "uuid": "13.0.0",
+    "uuid": "14.0.0",
     "vitest": "4.1.4"
   },
   "dependencies": {
