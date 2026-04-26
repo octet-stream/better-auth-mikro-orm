@@ -21,25 +21,13 @@
   },
   "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319",
   "engines": {
-    "node": ">= 18"
+    "node": ">= 22"
   },
-  "types": "./lib/adapter.d.cts",
-  "main": "./lib/adapter.cjs",
   "exports": {
     ".": {
-      "node": {
-        "types": "./lib/adapter.d.cts",
-        "module-sync": "./lib/adapter.js",
-        "default": "./lib/adapter.cjs"
-      },
-      "import": {
-        "types": "./lib/adapter.d.ts",
-        "default": "./lib/adapter.js"
-      },
-      "default": {
-        "types": "./lib/adapter.d.cts",
-        "default": "./lib/adapter.cjs"
-      }
+      "types": "./lib/adapter.d.ts",
+      "module-sync": "./lib/adapter.js",
+      "default": "./lib/adapter.js"
     },
     "./package.json": "./package.json"
   },
@@ -47,7 +35,7 @@
     "lib"
   ],
   "scripts": {
-    "build": "del-cli lib && tsup-node",
+    "build": "del-cli lib && tsc -p tsconfig.build.json",
     "test": "vitest run",
     "test.watch": "vitest",
     "test.ui": "vitest --ui",
@@ -57,36 +45,36 @@
     "prepare": "npx --yes is-in-ci || husky"
   },
   "devDependencies": {
-    "@better-auth/test-utils": "1.6.5",
-    "@biomejs/biome": "2.4.9",
-    "@changesets/changelog-github": "0.5.1",
-    "@changesets/cli": "2.29.2",
-    "@commitlint/cli": "20.5.0",
+    "@better-auth/test-utils": "1.6.9",
+    "@biomejs/biome": "2.4.13",
+    "@changesets/changelog-github": "0.6.0",
+    "@changesets/cli": "2.31.0",
+    "@commitlint/cli": "20.5.2",
     "@commitlint/config-conventional": "20.5.0",
     "@commitlint/types": "20.5.0",
     "@faker-js/faker": "10.4.0",
-    "@mikro-orm/core": "7.0.11",
-    "@mikro-orm/decorators": "7.0.11",
-    "@mikro-orm/sqlite": "7.0.11",
+    "@mikro-orm/core": "7.0.12",
+    "@mikro-orm/decorators": "7.0.12",
+    "@mikro-orm/sqlite": "7.0.12",
     "@types/node": "25.6.0",
     "@types/uuid": "11.0.0",
-    "@vitest/coverage-v8": "4.1.4",
-    "@vitest/ui": "4.1.4",
-    "better-auth": "1.6.5",
+    "@vitest/coverage-v8": "4.1.5",
+    "@vitest/ui": "4.1.5",
+    "better-auth": "1.6.9",
     "del-cli": "7.0.0",
-    "es-toolkit": "1.45.1",
+    "es-toolkit": "1.46.0",
     "husky": "9.1.7",
     "is-in-ci": "2.0.0",
     "tsup": "8.5.1",
-    "typescript": "5.9.2",
-    "uuid": "13.0.0",
-    "vitest": "4.1.4"
+    "typescript": "6.0.3",
+    "uuid": "14.0.0",
+    "vitest": "4.1.5"
   },
   "dependencies": {
     "dset": "3.1.4"
   },
   "peerDependencies": {
     "@mikro-orm/core": "^7.0.0",
-    "better-auth": "^1.0.0"
+    "better-auth": "^1.6.0"
   }
 }
