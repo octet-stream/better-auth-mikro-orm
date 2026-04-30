@@ -1,5 +1,12 @@
 # better-auth-mikro-orm
 
+## 1.0.0-next.2
+
+### Patch Changes
+
+- [#56](https://github.com/octet-stream/better-auth-mikro-orm/pull/56) [`22dda7b`](https://github.com/octet-stream/better-auth-mikro-orm/commit/22dda7bef40cc7a37334f886b85d25b3bc2a1ef1) Thanks [@octet-stream](https://github.com/octet-stream)! - Drop CJS build output and rely on require(esm) instead via [module-sync](https://nodejs.org/api/packages.html#conditional-exports) entry point.
+  ~~This change was introduced in previous release, but I forgot to add changeset.~~
+
 ## 1.0.0-next.1
 
 ### Minor Changes
