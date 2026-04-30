@@ -2,8 +2,8 @@ import type {Opt} from "@mikro-orm/core"
 import {Embedded, Entity, Property, Unique} from "@mikro-orm/decorators/legacy"
 import type {User as DatabaseUser} from "better-auth"
 
-import {Address} from "./Address.js"
-import {Base} from "./Base.js"
+import {Address} from "./Address.ts"
+import {Base} from "./Base.ts"
 
 @Entity()
 export class UserCustom extends Base implements Omit<DatabaseUser, "email"> {

@@ -8,9 +8,9 @@ import {
 } from "@mikro-orm/decorators/legacy"
 import type {User as DatabaseUser} from "better-auth"
 
-import {Base} from "../shared/Base.js"
-import {Address} from "./Address.js"
-import {Session} from "./Session.js"
+import {Base} from "../shared/Base.ts"
+import {Address} from "./Address.ts"
+import {Session} from "./Session.ts"
 
 @Entity()
 export class User extends Base implements DatabaseUser {

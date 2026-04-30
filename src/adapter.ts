@@ -5,7 +5,7 @@ import {
 } from "better-auth/adapters"
 import {dset} from "dset"
 
-import {createAdapterUtils} from "./utils/adapterUtils.js"
+import {createAdapterUtils} from "./utils/adapterUtils.ts"
 
 export interface MikroOrmAdapterConfig {
   /**

@@ -1,7 +1,7 @@
 import {Entity, Property} from "@mikro-orm/decorators/legacy"
 import type {Account as DatabaseAccount} from "better-auth"
 
-import {Base} from "./Base.js"
+import {Base} from "./Base.ts"
 
 @Entity()
 export class Account extends Base implements Omit<DatabaseAccount, "userId"> {

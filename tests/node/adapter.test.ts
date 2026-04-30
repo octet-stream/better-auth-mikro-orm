@@ -6,11 +6,11 @@ import {generateId} from "better-auth"
 import {NIL, validate} from "uuid"
 import {expect, suite, test} from "vitest"
 
-import {mikroOrmAdapter} from "../../src/index.js"
-import * as entities from "../fixtures/entities/defaults.js"
-import {createOrm} from "../fixtures/orm.js"
-import {createRandomUsersUtils} from "../fixtures/randomUsers.js"
-import type {SessionInput, UserInput} from "../utils/types.js"
+import {mikroOrmAdapter} from "../../src/adapter.ts"
+import * as entities from "../fixtures/entities/defaults.ts"
+import {createOrm} from "../fixtures/orm.ts"
+import {createRandomUsersUtils} from "../fixtures/randomUsers.ts"
+import type {SessionInput, UserInput} from "../utils/types.ts"
 
 const orm = createOrm({entities: Object.values(entities)})
 

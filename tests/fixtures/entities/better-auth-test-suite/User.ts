@@ -8,9 +8,9 @@ import {
 } from "@mikro-orm/decorators/legacy"
 import type {User as DatabaseUser} from "better-auth"
 
-import {Address} from "./Address.js"
-import {Base} from "./Base.js"
-import {Sessions} from "./Session.js"
+import {Address} from "./Address.ts"
+import {Base} from "./Base.ts"
+import {Sessions} from "./Session.ts"
 
 @Entity()
 export class User extends Base implements Omit<DatabaseUser, "email"> {

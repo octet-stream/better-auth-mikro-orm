@@ -1,8 +1,8 @@
 import {Entity, ManyToOne, Property, Unique} from "@mikro-orm/decorators/legacy"
 import type {Session as DatabaseSession} from "better-auth"
 
-import {Base} from "../shared/Base.js"
-import {User} from "./User.js"
+import {Base} from "../shared/Base.ts"
+import {User} from "./User.ts"
 
 @Entity()
 export class Session extends Base implements Omit<DatabaseSession, "userId"> {

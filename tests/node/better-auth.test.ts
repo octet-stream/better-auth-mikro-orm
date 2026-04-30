@@ -1,8 +1,8 @@
 import {normalTestSuite, testAdapter} from "@better-auth/test-utils/adapter"
 import {MikroORM} from "@mikro-orm/sqlite"
 
-import {mikroOrmAdapter} from "../../src/adapter.js"
-import * as entities from "../fixtures/entities/better-auth-test-suite.js"
+import {mikroOrmAdapter} from "../../src/adapter.ts"
+import * as entities from "../fixtures/entities/better-auth-test-suite.ts"
 
 const orm = await MikroORM.init({
   dbName: ":memory:",

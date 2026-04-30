@@ -4,7 +4,7 @@ import type {Where} from "better-auth"
 import type {AdapterFactoryCustomizeAdapterCreator} from "better-auth/adapters"
 import {dset} from "dset"
 
-import {createAdapterError} from "./createAdapterError.js"
+import {createAdapterError} from "./createAdapterError.ts"
 
 type AdapterFactoryCustomizeAdapterCreatorConfig =
   Parameters<AdapterFactoryCustomizeAdapterCreator>[0]

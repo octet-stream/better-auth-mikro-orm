@@ -1,9 +1,9 @@
 import {faker} from "@faker-js/faker"
 import type {MikroORM} from "@mikro-orm/sqlite"
 
-import type {UserInput} from "../utils/types.js"
+import type {UserInput} from "../utils/types.ts"
 
-import {User} from "./entities/defaults.js"
+import {User} from "./entities/defaults.ts"
 
 type OnUserCreatedCallback = (user: UserInput, index: number) => UserInput
 
