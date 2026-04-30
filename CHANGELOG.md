@@ -1,5 +1,11 @@
 # better-auth-mikro-orm
 
+## 1.0.0-next.1
+
+### Minor Changes
+
+- [#52](https://github.com/octet-stream/better-auth-mikro-orm/pull/52) [`7f2ece1`](https://github.com/octet-stream/better-auth-mikro-orm/commit/7f2ece1b6b3d873a265f877078a8eeacde3eb57a) Thanks [@octet-stream](https://github.com/octet-stream)! - Bump minimal Node.js version to 22
+
 ## 1.0.0-next.0
 
 ### Major Changes
