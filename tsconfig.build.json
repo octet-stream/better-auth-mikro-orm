@@ -5,6 +5,7 @@
     "rootDir": "./src",
     "noEmit": false,
     "target": "es2022",
-    "declaration": true
+    "declaration": true,
+    "rewriteRelativeImportExtensions": true
   }
 }
