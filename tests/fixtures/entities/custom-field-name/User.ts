@@ -1,18 +1,24 @@
-import type {Opt} from "@mikro-orm/core"
-import {Entity, Property, Unique} from "@mikro-orm/decorators/legacy"
-import type {User as DatabaseUser} from "better-auth"
+import {defineEntity, p} from "@mikro-orm/sqlite"
 
-import {Base} from "../shared/Base.ts"
+import {BaseProperties} from "../shared/Base.ts"
 
-@Entity()
-export class User extends Base implements Omit<DatabaseUser, "email"> {
-  @Property({type: "string"})
-  @Unique()
-  emailAddress!: string
+export const UserSchema = defineEntity({
+  name: "User",
+  properties: {
+    ...BaseProperties,
 
-  @Property({type: "boolean"})
-  emailVerified: Opt<boolean> = false
+    emailAddress: p.string(),
+    emailVerified: p.boolean().default(false),
+    name: p.string()
+  },
 
-  @Property({type: "string"})
-  name!: string
-}
+  uniques: [
+    {
+      properties: "emailAddress"
+    }
+  ]
+})
+
+export class User extends UserSchema.class {}
+
+UserSchema.setClass(User)

@@ -1,6 +1,6 @@
 export {Account} from "./better-auth-test-suite/Account.ts"
 export {Address} from "./better-auth-test-suite/Address.ts"
-export {Sessions} from "./better-auth-test-suite/Session.ts"
+export {Sessions} from "./better-auth-test-suite/Sessions.ts"
 export {TestModel} from "./better-auth-test-suite/TestModel.ts"
 export {User} from "./better-auth-test-suite/User.ts"
 export {UserCustom} from "./better-auth-test-suite/UserCustom.ts"

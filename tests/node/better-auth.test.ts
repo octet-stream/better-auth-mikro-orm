@@ -4,7 +4,7 @@ import {MikroORM} from "@mikro-orm/sqlite"
 import {mikroOrmAdapter} from "../../src/adapter.ts"
 import * as entities from "../fixtures/entities/better-auth-test-suite.ts"
 
-const orm = await MikroORM.init({
+const orm = new MikroORM({
   dbName: ":memory:",
   allowGlobalContext: true,
   entities: Object.values(entities)

@@ -1,16 +1,23 @@
-import {Entity, Property} from "@mikro-orm/decorators/legacy"
+import {defineEntity, p} from "@mikro-orm/sqlite"
 import type {Verification as DatabaseVerification} from "better-auth"
 
-import {Base} from "./Base.ts"
+import type {EntityShape} from "../../../utils/types.ts"
 
-@Entity()
-export class Verification extends Base implements DatabaseVerification {
-  @Property({type: "string"})
-  identifier!: string
+import {BaseProperties} from "./Base.ts"
 
-  @Property({type: "string"})
-  value!: string
+export const VerificationSchema = defineEntity({
+  name: "Verification",
+  properties: {
+    ...BaseProperties,
 
-  @Property({type: "datetime"})
-  expiresAt!: Date
-}
+    identifier: p.string(),
+    value: p.string(),
+    expiresAt: p.datetime()
+  } satisfies EntityShape<DatabaseVerification>
+})
+
+export class Verification
+  extends VerificationSchema.class
+  implements DatabaseVerification {}
+
+VerificationSchema.setClass(Verification)

@@ -1,32 +1,28 @@
-import {Collection, type Opt} from "@mikro-orm/core"
-import {
-  Embedded,
-  Entity,
-  OneToMany,
-  Property,
-  Unique
-} from "@mikro-orm/decorators/legacy"
-import type {User as DatabaseUser} from "better-auth"
+import {defineEntity, p} from "@mikro-orm/sqlite"
 
-import {Base} from "../shared/Base.ts"
+import {BaseProperties} from "../shared/Base.ts"
+
 import {Address} from "./Address.ts"
 import {Session} from "./Session.ts"
 
-@Entity()
-export class User extends Base implements DatabaseUser {
-  @Property({type: "string"})
-  @Unique()
-  email!: string
+const UserSchema = defineEntity({
+  name: "User",
+  properties: {
+    ...BaseProperties,
 
-  @Property({type: "boolean"})
-  emailVerified: Opt<boolean> = false
+    email: p.string(),
+    emailVerified: p.boolean().default(false),
+    name: p.string(),
+    sessions: () => p.oneToMany(Session).mappedBy(session => session.user),
+    address: () => p.embedded(Address).nullable()
+  },
+  uniques: [
+    {
+      properties: "email"
+    }
+  ]
+})
 
-  @Property({type: "string"})
-  name!: string
+export class User extends UserSchema.class {}
 
-  @OneToMany(() => Session, "user")
-  sessions = new Collection<Session, this>(this)
-
-  @Embedded(() => Address, {object: true, nullable: true})
-  address?: Address
-}
+UserSchema.setClass(User)

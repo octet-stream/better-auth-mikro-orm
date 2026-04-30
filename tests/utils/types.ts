@@ -1,3 +1,8 @@
+export type EntityShape<T extends {[x: PropertyKey]: any}> = Record<
+  keyof T | (string & {}),
+  any
+>
+
 export interface AddressInput {
   street: string
   city: string

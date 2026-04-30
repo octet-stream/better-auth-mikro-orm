@@ -1,34 +1,28 @@
-import {Entity, Property} from "@mikro-orm/decorators/legacy"
+import {defineEntity, p} from "@mikro-orm/sqlite"
 import type {Account as DatabaseAccount} from "better-auth"
 
-import {Base} from "./Base.ts"
+import type {EntityShape} from "../../../utils/types.ts"
+import {BaseProperties} from "./Base.ts"
 
-@Entity()
-export class Account extends Base implements Omit<DatabaseAccount, "userId"> {
-  @Property({type: "string"})
-  accountId!: string
+export const AccountSchema = defineEntity({
+  name: "Account",
+  properties: {
+    ...BaseProperties,
 
-  @Property({type: "string"})
-  providerId!: string
+    accountId: p.string(),
+    providerId: p.string(),
+    accessToken: p.string().nullable(),
+    refreshToken: p.string().nullable(),
+    accessTokenExpiresAt: p.datetime().nullable(),
+    refreshTokenExpiresAt: p.datetime().nullable(),
+    scope: p.string().nullable(),
+    idToken: p.string().nullable(),
+    password: p.string().nullable()
+  } satisfies EntityShape<Omit<DatabaseAccount, "userId">>
+})
 
-  @Property({type: "string", nullable: true})
-  accessToken?: string | null | undefined
+export class Account
+  extends AccountSchema.class
+  implements Omit<DatabaseAccount, "userId"> {}
 
-  @Property({type: "string", nullable: true})
-  refreshToken?: string | null | undefined
-
-  @Property({type: "datetime", nullable: true})
-  accessTokenExpiresAt?: Date | null | undefined
-
-  @Property({type: "datetime", nullable: true})
-  refreshTokenExpiresAt?: Date | null | undefined
-
-  @Property({type: "string", nullable: true})
-  scope?: string | null | undefined
-
-  @Property({type: "string", nullable: true})
-  idToken?: string | null | undefined
-
-  @Property({type: "string", nullable: true})
-  password?: string | null | undefined
-}
+AccountSchema.setClass(Account)

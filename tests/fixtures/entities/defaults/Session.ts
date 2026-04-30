@@ -1,24 +1,22 @@
-import {Entity, ManyToOne, Property, Unique} from "@mikro-orm/decorators/legacy"
-import type {Session as DatabaseSession} from "better-auth"
+import {defineEntity, p} from "@mikro-orm/sqlite"
 
-import {Base} from "../shared/Base.ts"
+import {BaseProperties} from "../shared/Base.ts"
 import {User} from "./User.ts"
 
-@Entity()
-export class Session extends Base implements Omit<DatabaseSession, "userId"> {
-  @Property({type: "string"})
-  @Unique()
-  token!: string
+export const SessionSchema = defineEntity({
+  name: "Session",
+  properties: {
+    ...BaseProperties,
 
-  @Property({type: Date})
-  expiresAt!: Date
+    token: p.string(),
+    expiresAt: p.datetime(),
+    ipAddress: p.string().nullable(),
+    userAgent: p.string().nullable(),
 
-  @Property({type: "string", nullable: true, default: null})
-  ipAddress?: string | null | undefined
+    user: () => p.manyToOne(User)
+  }
+})
 
-  @Property({type: "string", nullable: true, default: null})
-  userAgent?: string | null | undefined
+export class Session extends SessionSchema.class {}
 
-  @ManyToOne(() => User)
-  user!: User
-}
+SessionSchema.setClass(Session)

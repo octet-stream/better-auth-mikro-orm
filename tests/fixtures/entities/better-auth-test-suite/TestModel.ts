@@ -1,20 +1,16 @@
-import {Entity, PrimaryKey, Property} from "@mikro-orm/decorators/legacy"
-import {JsonType} from "@mikro-orm/sqlite"
+import {defineEntity, p} from "@mikro-orm/sqlite"
 
-@Entity()
-export class TestModel {
-  @PrimaryKey({type: "string"})
-  id!: string
+export const TestModelSchema = defineEntity({
+  name: "TestModel",
+  properties: {
+    id: p.string().primary(),
+    stringArray: p.json<string[]>().nullable(),
+    numberArray: p.json<number[]>().nullable(),
+    testField: p.string().nullable(),
+    cbDefaultValueField: p.string().nullable()
+  }
+})
 
-  @Property({type: JsonType, nullable: true})
-  stringArray?: string[]
+export class TestModel extends TestModelSchema.class {}
 
-  @Property({type: JsonType, nullable: true})
-  numberArray?: number[]
-
-  @Property({type: "string", nullable: true})
-  testField?: string
-
-  @Property({type: "string", nullable: true})
-  cbDefaultValueField?: string
-}
+TestModelSchema.setClass(TestModel)
