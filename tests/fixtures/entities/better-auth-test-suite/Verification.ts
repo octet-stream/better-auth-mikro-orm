@@ -1,23 +1,22 @@
 import {defineEntity, p} from "@mikro-orm/sqlite"
-import type {Verification as DatabaseVerification} from "better-auth"
+import type {Verification as BAVerification} from "better-auth"
 
 import type {EntityShape} from "../../../utils/types.ts"
 
-import {BaseProperties} from "./Base.ts"
+import {Base} from "./Base.ts"
 
 export const VerificationSchema = defineEntity({
   name: "Verification",
+  extends: Base,
   properties: {
-    ...BaseProperties,
-
     identifier: p.string(),
     value: p.string(),
     expiresAt: p.datetime()
-  } satisfies EntityShape<DatabaseVerification>
+  } satisfies EntityShape<BAVerification, keyof Base>
 })
 
 export class Verification
   extends VerificationSchema.class
-  implements DatabaseVerification {}
+  implements BAVerification {}
 
 VerificationSchema.setClass(Verification)

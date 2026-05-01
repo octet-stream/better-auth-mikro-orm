@@ -1,12 +1,11 @@
 import {defineEntity, p} from "@mikro-orm/sqlite"
 
-import {BaseProperties} from "../shared/Base.ts"
+import {Base} from "../shared/Base.ts"
 
 export const CustomUserSchema = defineEntity({
   name: "CustomUser",
+  extends: Base,
   properties: {
-    ...BaseProperties,
-
     email: p.string(),
     emailVerified: p.boolean().default(false),
     name: p.string()

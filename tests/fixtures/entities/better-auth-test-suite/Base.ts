@@ -1,9 +1,16 @@
-import {p} from "@mikro-orm/sqlite"
+import {defineEntity, p} from "@mikro-orm/sqlite"
 
-import {BaseProperties as BasePropertiesOriginal} from "../shared/Base.ts"
+import {Base as BaseShared} from "../shared/Base.ts"
 
-export const BaseProperties = {
-  ...BasePropertiesOriginal,
+export const BaseSchema = defineEntity({
+  name: "Base",
+  abstract: true,
+  extends: BaseShared,
+  properties: {
+    id: p.string().primary()
+  }
+})
 
-  id: p.string().primary()
-}
+export abstract class Base extends BaseSchema.class {}
+
+BaseSchema.setClass(Base)

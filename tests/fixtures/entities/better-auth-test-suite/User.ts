@@ -1,17 +1,18 @@
 import {defineEntity, p} from "@mikro-orm/sqlite"
-import type {User as DatabaseUser} from "better-auth"
+import type {User as BAUser} from "better-auth"
 
 import type {EntityShape} from "../../../utils/types.ts"
 
 import {Address} from "./Address.ts"
-import {BaseProperties} from "./Base.ts"
+import {Base} from "./Base.ts"
 import {Sessions} from "./Sessions.ts"
+
+type DBUser = Omit<BAUser, "email">
 
 export const UserSchema = defineEntity({
   name: "User",
+  extends: Base,
   properties: {
-    ...BaseProperties,
-
     email_address: p.string(),
     emailVerified: p.boolean(),
     name: p.string(),
@@ -23,7 +24,7 @@ export const UserSchema = defineEntity({
     numericField: p.integer().nullable(),
     testField: p.string().nullable(),
     cbDefaultValueField: p.string().nullable()
-  } satisfies EntityShape<Omit<DatabaseUser, "email">>,
+  } satisfies EntityShape<DBUser, keyof Base>,
   uniques: [
     {
       properties: "email_address"
@@ -31,8 +32,6 @@ export const UserSchema = defineEntity({
   ]
 })
 
-export class User
-  extends UserSchema.class
-  implements Omit<DatabaseUser, "email"> {}
+export class User extends UserSchema.class implements DBUser {}
 
 UserSchema.setClass(User)
