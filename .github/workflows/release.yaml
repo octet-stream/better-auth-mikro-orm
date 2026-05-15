@@ -30,7 +30,7 @@ jobs:
 
       - name: Setup pnpm
         id: pnpm-install
-        uses: pnpm/action-setup@v6.0.5
+        uses: pnpm/action-setup@v6.0.8
         with:
           run_install: false
       
