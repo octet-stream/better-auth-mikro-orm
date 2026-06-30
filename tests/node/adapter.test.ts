@@ -159,7 +159,7 @@ suite("findOne", () => {
     expect(actual?.id).toBe(expected.id)
   })
 
-  test("by arbitary field", async () => {
+  test("by arbitrary field", async () => {
     const expected = await randomUsers.createAndFlushOne()
     const actual = await adapter.findOne<DatabaseUser>({
       model: "user",
