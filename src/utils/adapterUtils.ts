@@ -73,7 +73,7 @@ export interface AdapterUtils {
   ): Record<string, any>
 
   /**
-   * Transfroms hiven list of Where clause(s) for Mikro ORM.
+   * Transforms hiven list of Where clause(s) for Mikro ORM.
    *
    * @param entityName - Entity name
    * @param where - A list where clause(s) to normalize
