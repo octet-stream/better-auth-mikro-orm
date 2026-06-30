@@ -73,7 +73,7 @@ export interface AdapterUtils {
   ): Record<string, any>
 
   /**
-   * Transfroms hiven list of Where clause(s) for Mikro ORM.
+   * Transforms given list of Where clause(s) for Mikro ORM.
    *
    * @param entityName - Entity name
    * @param where - A list where clause(s) to normalize
@@ -358,7 +358,7 @@ export function createAdapterUtils(
         return createWhereClause(path, `${input.value}%`, "$like", target)
       case "ends_with":
         return createWhereClause(path, `%${input.value}`, "$like", target)
-      // The next 5 case statemets are _expected_ to fall through so we can simplify and reuse the same logic for these operators
+      // The next 5 case statements are _expected_ to fall through so we can simplify and reuse the same logic for these operators
       case "gt":
       case "gte":
       case "lt":
