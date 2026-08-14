@@ -26,6 +26,15 @@ export interface MikroOrmAdapterConfig {
    * @default true
    */
   supportsJSON?: boolean
+
+  /**
+   * Indicates whether arrays are supported natively by the target database.
+   *
+   * If disabled, Better Auth will serialize array fields for you.
+   *
+   * @default false
+   */
+  supportsArrays?: boolean
 }
 
 /**
@@ -41,14 +50,19 @@ export interface MikroOrmAdapterConfig {
  */
 export const mikroOrmAdapter = (
   orm: MikroORM,
-  {debugLogs, supportsJSON = true}: MikroOrmAdapterConfig = {}
+  {
+    debugLogs,
+    supportsJSON = true,
+    supportsArrays = false
+  }: MikroOrmAdapterConfig = {}
 ) =>
   createAdapterFactory({
     config: {
       adapterId: "mikro-orm-adapter",
       adapterName: "Mikro ORM Adapter",
       debugLogs,
-      supportsJSON
+      supportsJSON,
+      supportsArrays
     },
 
     adapter(config) {
