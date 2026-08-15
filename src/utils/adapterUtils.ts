@@ -102,7 +102,6 @@ export function createAdapterUtils(
   config: AdapterFactoryCustomizeAdapterCreatorConfig
 ): AdapterUtils {
   const namingStrategy = orm.config.getNamingStrategy()
-  const ormMetadata = orm.getMetadata()
 
   const normalizeEntityName: AdapterUtils["normalizeEntityName"] = name =>
     namingStrategy.getEntityName(namingStrategy.classToTableName(name))
@@ -110,6 +109,7 @@ export function createAdapterUtils(
   const getEntityMetadata: AdapterUtils["getEntityMetadata"] = (
     entityName: string
   ) => {
+    const ormMetadata = orm.getMetadata()
     const normalizedEntityName = normalizeEntityName(entityName)
 
     if (!ormMetadata.has(normalizedEntityName)) {
