@@ -102,7 +102,7 @@ export function createAdapterUtils(
   config: AdapterFactoryCustomizeAdapterCreatorConfig
 ): AdapterUtils {
   const namingStrategy = orm.config.getNamingStrategy()
-  const metadata = orm.getMetadata()
+  const ormMetadata = orm.getMetadata()
 
   const normalizeEntityName: AdapterUtils["normalizeEntityName"] = name =>
     namingStrategy.getEntityName(namingStrategy.classToTableName(name))
@@ -112,13 +112,13 @@ export function createAdapterUtils(
   ) => {
     const normalizedEntityName = normalizeEntityName(entityName)
 
-    if (!metadata.has(normalizedEntityName)) {
+    if (!ormMetadata.has(normalizedEntityName)) {
       createAdapterError(
         `Cannot find metadata for "${normalizedEntityName}" entity. Make sure it defined and listed in your Mikro ORM config.`
       )
     }
 
-    return metadata.get(normalizedEntityName)
+    return ormMetadata.get(normalizedEntityName)
   }
 
   /**
