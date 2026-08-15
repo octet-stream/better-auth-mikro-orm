@@ -196,7 +196,7 @@ export function createAdapterUtils(
    * @param entityName - The name of the entity
    * @param prop - Property metadata
    */
-  const getReferencedPropertyName = (
+  const getEntityPropertyName = (
     metadata: EntityMetadata,
     propertyMetadata: EntityPropertyMetadata
   ) => getReferencedColumnName(metadata.className, propertyMetadata)
@@ -283,7 +283,7 @@ export function createAdapterUtils(
 
     Object.entries(serializedOutput)
       .map(([key, value]) => ({
-        path: getReferencedPropertyName(
+        path: getEntityPropertyName(
           metadata,
           getEntityPropertyMetadata(metadata, key)
         ),
