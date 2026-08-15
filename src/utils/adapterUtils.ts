@@ -271,92 +271,63 @@ export function createAdapterUtils(
     return result
   }
 
-  /**
-   * Creates a `where` clause with given params.
-   *
-   * @param fieldName - The name of the field
-   * @param path - Path to the field reference
-   * @param value - Field's value
-   * @param op - Query operator
-   * @param target - Target object to assign the result to. The object will be *mutated*
-   */
-  function createWhereClause(
-    path: Array<string | number>,
-    value: unknown,
-    op?: string,
-    target: Record<string, any> = {}
-  ): Record<string, any> {
-    dset(target, op == null || op === "eq" ? path : path.concat(op), value)
-
-    return target
-  }
-
-  /**
-   * Same as `createWhereClause`, but creates a statement with only `$in` operator and check if the `value` is an array.
-   *
-   * @param fieldName - The name of the field
-   * @param path - Path to the field reference
-   * @param value - Field's value
-   * @param target - Target object to assign the result to. The object will be *mutated*
-   */
-  function createWhereInClause(
-    fieldName: string,
-    path: Array<string | number>,
-    value: unknown,
-    operator: "in" | "nin",
-    target?: Record<string, any>
-  ): Record<string, any> {
-    const normalizedOperator = `$${operator}`
-
-    if (!Array.isArray(value)) {
-      createAdapterError(
-        `The value for the field "${fieldName}" must be an array when using the ${normalizedOperator} operator.`
-      )
-    }
-
-    return createWhereClause(path, value, normalizedOperator, target)
-  }
-
   function normalizeWhereClause(
     path: Array<string | number>,
-    input: Where,
-    target?: Record<string, any>
+    where: Where,
+    target: Record<string, any> = {}
   ): Record<string, any> {
-    switch (input.operator) {
+    let normalizedValue = where.value
+    let normalizedPath = path
+
+    switch (where.operator) {
       case "in":
-        return createWhereInClause(input.field, path, input.value, "in", target)
+        if (!Array.isArray(where.value)) {
+          createAdapterError(
+            `The value for the field "${where.field}" must be an array when using the $in operator.`
+          )
+        }
+
+        normalizedPath = path.concat("$in")
+        break
       case "not_in":
-        return createWhereInClause(
-          input.field,
-          path,
-          input.value,
-          "nin",
-          target
-        )
+        if (!Array.isArray(where.value)) {
+          createAdapterError(
+            `The value for the field "${where.field}" must be an array when using the $nin operator.`
+          )
+        }
+
+        normalizedPath = path.concat("$nin")
+        break
       case "contains":
-        return createWhereClause(path, `%${input.value}%`, "$like", target)
+        normalizedPath = path.concat("$like")
+        normalizedValue = `%${where.value}%`
+        break
       case "starts_with":
-        return createWhereClause(path, `${input.value}%`, "$like", target)
+        normalizedPath = path.concat("$like")
+        normalizedValue = `${where.value}%`
+        break
       case "ends_with":
-        return createWhereClause(path, `%${input.value}`, "$like", target)
+        normalizedPath = path.concat("$like")
+        normalizedValue = `%${where.value}`
+        break
       // The next 5 case statements are _expected_ to fall through so we can simplify and reuse the same logic for these operators
       case "gt":
       case "gte":
       case "lt":
       case "lte":
       case "ne":
-        return createWhereClause(
-          path,
-          input.value,
-          `$${input.operator}`,
-          target
-        )
+        normalizedPath = path.concat(`$${where.operator}`)
+        break
       case "eq":
       case undefined:
-        return createWhereClause(path, input.value, "eq", target)
+        break
       default:
-        return throwUnhandledWhereOperator(input.operator)
+        return throwUnhandledWhereOperator(where.operator)
     }
+
+    dset(target, normalizedPath, normalizedValue)
+
+    return target
   }
 
   const normalizeWhereClauses: AdapterUtils["normalizeWhereClauses"] = (
