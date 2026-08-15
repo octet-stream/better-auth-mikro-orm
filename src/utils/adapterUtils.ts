@@ -13,7 +13,7 @@ import {createAdapterError} from "./createAdapterError.js"
 type AdapterFactoryCustomizeAdapterCreatorConfig =
   Parameters<AdapterFactoryCustomizeAdapterCreator>[0]
 
-function checkForExhaustiveWhereOperator(op: never): never {
+function throwUnhandledWhereOperator(op: never): never {
   throw new RangeError(
     `[Better Auth MikroORM adapter error] Unhandled WHERE operator detected: ${op}`
   )
@@ -388,7 +388,7 @@ export function createAdapterUtils(
       case undefined:
         return createWhereClause(path, input.value, "eq", target)
       default:
-        return checkForExhaustiveWhereOperator(input.operator)
+        return throwUnhandledWhereOperator(input.operator)
     }
   }
 
