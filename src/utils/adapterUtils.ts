@@ -131,18 +131,18 @@ export function createAdapterUtils(
     metadata: EntityMetadata,
     fieldName: string
   ): EntityProperty {
-    const prop = metadata.props.find(prop => {
+    const propertyMetadata = metadata.props.find(propertyMetadata => {
       if (
-        selfNamedReferenceKinds.includes(prop.kind) &&
-        prop.name === fieldName
+        selfNamedReferenceKinds.includes(propertyMetadata.kind) &&
+        propertyMetadata.name === fieldName
       ) {
         return true
       }
 
       if (
-        prop.kind === ReferenceKind.MANY_TO_ONE &&
-        (prop.name === fieldName ||
-          prop.fieldNames.includes(
+        propertyMetadata.kind === ReferenceKind.MANY_TO_ONE &&
+        (propertyMetadata.name === fieldName ||
+          propertyMetadata.fieldNames.includes(
             namingStrategy.propertyToColumnName(fieldName)
           ))
       ) {
@@ -152,13 +152,13 @@ export function createAdapterUtils(
       return false
     })
 
-    if (!prop) {
+    if (!propertyMetadata) {
       createAdapterError(
         `Can't find property "${fieldName}" on entity "${metadata.className}".`
       )
     }
 
-    return prop
+    return propertyMetadata
   }
 
   /**
@@ -167,19 +167,22 @@ export function createAdapterUtils(
    * @param entityName - The name of the entity
    * @param prop - Property metadata
    */
-  function getReferencedColumnName(entityName: string, prop: EntityProperty) {
-    if (selfNamedReferenceKinds.includes(prop.kind)) {
-      return prop.name
+  function getReferencedColumnName(
+    entityName: string,
+    propertyMetadata: EntityProperty
+  ) {
+    if (selfNamedReferenceKinds.includes(propertyMetadata.kind)) {
+      return propertyMetadata.name
     }
 
-    if (prop.kind === ReferenceKind.MANY_TO_ONE) {
+    if (propertyMetadata.kind === ReferenceKind.MANY_TO_ONE) {
       return namingStrategy.columnNameToProperty(
-        namingStrategy.joinColumnName(prop.name)
+        namingStrategy.joinColumnName(propertyMetadata.name)
       )
     }
 
     createAdapterError(
-      `Reference kind ${prop.kind} is not supported. Defined in "${entityName}" entity for "${prop.name}" field.`
+      `Reference kind ${propertyMetadata.kind} is not supported. Defined in "${entityName}" entity for "${propertyMetadata.name}" field.`
     )
   }
 
@@ -191,37 +194,37 @@ export function createAdapterUtils(
    */
   const getReferencedPropertyName = (
     metadata: EntityMetadata,
-    prop: EntityProperty
-  ) => getReferencedColumnName(metadata.className, prop)
+    propertyMetadata: EntityProperty
+  ) => getReferencedColumnName(metadata.className, propertyMetadata)
 
   const getFieldPath: AdapterUtils["getFieldPath"] = (
     metadata,
     fieldName,
     throwOnShadowProps = false
   ) => {
-    const prop = getEntityPropertyMetadata(metadata, fieldName)
+    const propertyMetadata = getEntityPropertyMetadata(metadata, fieldName)
 
-    if (prop.persist === false && throwOnShadowProps) {
+    if (propertyMetadata.persist === false && throwOnShadowProps) {
       createAdapterError(
         `Cannot serialize "${fieldName}" into path, because it cannot be persisted in "${metadata.tableName}" table.`
       )
     }
 
     if (
-      prop.kind === ReferenceKind.SCALAR ||
-      prop.kind === ReferenceKind.EMBEDDED
+      propertyMetadata.kind === ReferenceKind.SCALAR ||
+      propertyMetadata.kind === ReferenceKind.EMBEDDED
     ) {
-      return [prop.name]
+      return [propertyMetadata.name]
     }
 
-    if (prop.kind === ReferenceKind.MANY_TO_ONE) {
-      if (prop.referencedPKs.length > 1) {
+    if (propertyMetadata.kind === ReferenceKind.MANY_TO_ONE) {
+      if (propertyMetadata.referencedPKs.length > 1) {
         createAdapterError(
-          `The "${fieldName}" field references to a table "${prop.name}" with complex primary key, which is not supported`
+          `The "${fieldName}" field references to a table "${propertyMetadata.name}" with complex primary key, which is not supported`
         )
       }
 
-      return [prop.name, namingStrategy.referenceColumnName()]
+      return [propertyMetadata.name, namingStrategy.referenceColumnName()]
     }
 
     createAdapterError(
@@ -240,27 +243,27 @@ export function createAdapterUtils(
    * @param value - Raw input value
    */
   const normalizePropertyValue = (
-    property: EntityProperty,
+    propertyMetadata: EntityProperty,
     value: unknown
   ): unknown => {
     if (
-      !property.targetMeta ||
-      property.kind === ReferenceKind.SCALAR ||
-      property.kind === ReferenceKind.EMBEDDED
+      !propertyMetadata.targetMeta ||
+      propertyMetadata.kind === ReferenceKind.SCALAR ||
+      propertyMetadata.kind === ReferenceKind.EMBEDDED
     ) {
       return value
     }
 
-    return orm.em.getReference(property.targetMeta.class, value)
+    return orm.em.getReference(propertyMetadata.targetMeta.class, value)
   }
 
   const normalizeInput: AdapterUtils["normalizeInput"] = (metadata, input) => {
     const fields: Record<string, any> = {}
     Object.entries(input).forEach(([key, value]) => {
-      const property = getEntityPropertyMetadata(metadata, key)
-      const normalizedValue = normalizePropertyValue(property, value)
+      const propertyMetadata = getEntityPropertyMetadata(metadata, key)
+      const normalizedValue = normalizePropertyValue(propertyMetadata, value)
 
-      dset(fields, [property.name], normalizedValue)
+      dset(fields, [propertyMetadata.name], normalizedValue)
     })
 
     return fields
