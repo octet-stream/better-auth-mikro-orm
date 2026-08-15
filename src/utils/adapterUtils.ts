@@ -242,19 +242,13 @@ export function createAdapterUtils(
     select
   ): Record<string, any> => {
     let result: Record<string, any> = {}
-    const serializedOutput = serialize(output)
 
-    Object.entries(serializedOutput)
-      .map(([key, value]) => ({
-        path: getEntityPropertyName(
-          metadata,
-          getEntityPropertyMetadata(metadata, key)
-        ),
-        value
-      }))
-      .forEach(({path, value}) => {
-        dset(result, path, value)
-      })
+    for (const [key, value] of Object.entries(serialize(output))) {
+      const property = getEntityPropertyMetadata(metadata, key)
+      const path = getEntityPropertyName(metadata, property)
+
+      dset(result, path, value)
+    }
 
     // Filter out unnecessary fields
     // TODO: Implement proper select on mikro-orm querying level
