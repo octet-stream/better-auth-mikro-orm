@@ -10,7 +10,7 @@ import {dset} from "dset"
 
 import {createAdapterError} from "./createAdapterError.js"
 
-type AdapterFactoryCustomizeAdapterCreatorConfig =
+type BetterAuthAdapterFactoryConfig =
   Parameters<AdapterFactoryCustomizeAdapterCreator>[0]
 
 function throwUnhandledWhereOperator(op: never): never {
@@ -103,7 +103,7 @@ const selfNamedReferenceKinds = [
  */
 export function createAdapterUtils(
   orm: MikroORM,
-  config: AdapterFactoryCustomizeAdapterCreatorConfig
+  config: BetterAuthAdapterFactoryConfig
 ): AdapterUtils {
   const namingStrategy = orm.config.getNamingStrategy()
 
