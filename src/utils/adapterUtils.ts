@@ -93,7 +93,7 @@ const selfNamedReferenceKinds = [
 ]
 
 /**
- * Creates bunch of utilities for adapter
+ * Creates a bunch of utilities for adapter
  *
  * @param orm - Mikro ORM instance
  * @param config - Better Auth adapter factory config
