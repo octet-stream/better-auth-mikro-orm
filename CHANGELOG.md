@@ -1,5 +1,11 @@
 # better-auth-mikro-orm
 
+## 0.5.1
+
+### Patch Changes
+
+- [#86](https://github.com/octet-stream/better-auth-mikro-orm/pull/86) [`b624f28`](https://github.com/octet-stream/better-auth-mikro-orm/commit/b624f28e08d90c05956d94df707a981f64e9a575) Thanks [@Rebne](https://github.com/Rebne)! - Replace deprecated EntityManager.persistAndFlush()
+
 ## 0.5.0
 
 ### Minor Changes
