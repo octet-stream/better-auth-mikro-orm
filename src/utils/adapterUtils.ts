@@ -23,7 +23,7 @@ export interface AdapterUtils {
   /**
    * Returns metadata for given `entityName` from MetadataStorage.
    *
-   * @param entityName - The name of the entity to get the metadata for
+   * @param name - The name of the entity to get the metadata for
    *
    * @throws BetterAuthError when no metadata found
    */
@@ -51,7 +51,7 @@ export interface AdapterUtils {
   /**
    * Normalized Better Auth data for Mikro ORM.
    *
-   * @param entityName - The name of the entity
+   * @param metadata - The name of the entity
    * @param input - The data to normalize
    */
   normalizeInput(
@@ -62,7 +62,7 @@ export interface AdapterUtils {
   /**
    * Normalizes the Mikro ORM output for Better Auth.
    *
-   * @param entityName - The name of the entity
+   * @param metadata - The name of the entity
    * @param output - The result of a Mikro ORM query
    * @param select - A list of fields to return
    */
@@ -75,7 +75,7 @@ export interface AdapterUtils {
   /**
    * Transforms given list of Where clause(s) for Mikro ORM.
    *
-   * @param entityName - Entity name
+   * @param metadata - Entity name
    * @param where - A list where clause(s) to normalize
    */
   normalizeWhereClauses(
@@ -96,6 +96,7 @@ const selfNamedReferenceKinds = [
  * Creates bunch of utilities for adapter
  *
  * @param orm - Mikro ORM instance
+ * @param config - Better Auth adapter factory config
  */
 export function createAdapterUtils(
   orm: MikroORM,
@@ -159,8 +160,8 @@ export function createAdapterUtils(
   /**
    * Returns referenced _column_ name for given `prop` using [naming strategy](https://mikro-orm.io/docs/naming-strategy) defined by the config.
    *
-   * @param entityName - The name of the entity
-   * @param prop - Property metadata
+   * @param metadata - Entity metadata
+   * @param propertyMetadata - Property metadata
    */
   const getEntityPropertyName = (
     metadata: EntityMetadata,
