@@ -22,6 +22,17 @@ const adapter = mikroOrmAdapter(orm, {
   }
 })({})
 
+test("accepts supportsArrays config", () => {
+  const adapter = mikroOrmAdapter(orm, {
+    debugLogs: {
+      isRunningAdapterTests: true
+    },
+    supportsArrays: true
+  })({})
+
+  expect(adapter.options?.adapterConfig.supportsArrays).toBe(true)
+})
+
 suite("create", () => {
   test("a new record", async () => {
     const expected = randomUsers.createOne()
