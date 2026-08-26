@@ -101,11 +101,11 @@ export function createAdapterUtils(
   orm: MikroORM,
   config: AdapterFactoryCustomizeAdapterCreatorConfig
 ): AdapterUtils {
-  const naming = orm.config.getNamingStrategy()
+  const namingStrategy = orm.config.getNamingStrategy()
   const metadata = orm.getMetadata()
 
   const normalizeEntityName: AdapterUtils["normalizeEntityName"] = name =>
-    naming.getEntityName(naming.classToTableName(name))
+    namingStrategy.getEntityName(namingStrategy.classToTableName(name))
 
   const getEntityMetadata: AdapterUtils["getEntityMetadata"] = (
     entityName: string
@@ -139,7 +139,9 @@ export function createAdapterUtils(
       if (
         prop.kind === ReferenceKind.MANY_TO_ONE &&
         (prop.name === fieldName ||
-          prop.fieldNames.includes(naming.propertyToColumnName(fieldName)))
+          prop.fieldNames.includes(
+            namingStrategy.propertyToColumnName(fieldName)
+          ))
       ) {
         return true
       }
@@ -168,7 +170,9 @@ export function createAdapterUtils(
     }
 
     if (prop.kind === ReferenceKind.MANY_TO_ONE) {
-      return naming.columnNameToProperty(naming.joinColumnName(prop.name))
+      return namingStrategy.columnNameToProperty(
+        namingStrategy.joinColumnName(prop.name)
+      )
     }
 
     createAdapterError(
@@ -214,7 +218,7 @@ export function createAdapterUtils(
         )
       }
 
-      return [prop.name, naming.referenceColumnName()]
+      return [prop.name, namingStrategy.referenceColumnName()]
     }
 
     createAdapterError(
