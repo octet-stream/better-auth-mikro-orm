@@ -23,7 +23,7 @@ export interface AdapterUtils {
   /**
    * Returns metadata for given `entityName` from MetadataStorage.
    *
-   * @param name - The name of the entity to get the metadata for
+   * @param name - Name of the entity to get the metadata for
    *
    * @throws BetterAuthError when no metadata found
    */
@@ -51,8 +51,8 @@ export interface AdapterUtils {
   /**
    * Normalized Better Auth data for Mikro ORM.
    *
-   * @param metadata - The name of the entity
-   * @param input - The data to normalize
+   * @param metadata - Name of the entity
+   * @param input - Data to normalize
    */
   normalizeInput(
     metadata: EntityMetadata,
@@ -62,8 +62,8 @@ export interface AdapterUtils {
   /**
    * Normalizes the Mikro ORM output for Better Auth.
    *
-   * @param metadata - The name of the entity
-   * @param output - The result of a Mikro ORM query
+   * @param metadata - Name of the entity
+   * @param output - Result of a Mikro ORM query
    * @param select - A list of fields to return
    */
   normalizeOutput(
@@ -125,7 +125,7 @@ export function createAdapterUtils(
    * Returns metadata for a property by given `fieldName`.
    *
    * @param metadata - Entity metadata
-   * @param fieldName - The name of the field to get metadata for
+   * @param fieldName - Name of the field to get metadata for
    */
   function getEntityPropertyMetadata(
     metadata: EntityMetadata,
