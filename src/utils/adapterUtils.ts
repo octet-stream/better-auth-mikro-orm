@@ -1,4 +1,8 @@
-import type {EntityMetadata, EntityProperty, MikroORM} from "@mikro-orm/core"
+import type {
+  EntityMetadata,
+  EntityProperty as EntityPropertyMetadata,
+  MikroORM
+} from "@mikro-orm/core"
 import {ReferenceKind, serialize} from "@mikro-orm/core"
 import type {Where} from "better-auth"
 import type {AdapterFactoryCustomizeAdapterCreator} from "better-auth/adapters"
@@ -130,7 +134,7 @@ export function createAdapterUtils(
   function getEntityPropertyMetadata(
     metadata: EntityMetadata,
     fieldName: string
-  ): EntityProperty {
+  ): EntityPropertyMetadata {
     const propertyMetadata = metadata.props.find(propertyMetadata => {
       if (
         selfNamedReferenceKinds.includes(propertyMetadata.kind) &&
@@ -169,7 +173,7 @@ export function createAdapterUtils(
    */
   function getReferencedColumnName(
     entityName: string,
-    propertyMetadata: EntityProperty
+    propertyMetadata: EntityPropertyMetadata
   ) {
     if (selfNamedReferenceKinds.includes(propertyMetadata.kind)) {
       return propertyMetadata.name
@@ -194,7 +198,7 @@ export function createAdapterUtils(
    */
   const getReferencedPropertyName = (
     metadata: EntityMetadata,
-    propertyMetadata: EntityProperty
+    propertyMetadata: EntityPropertyMetadata
   ) => getReferencedColumnName(metadata.className, propertyMetadata)
 
   const getFieldPath: AdapterUtils["getFieldPath"] = (
@@ -243,7 +247,7 @@ export function createAdapterUtils(
    * @param value - Raw input value
    */
   const normalizePropertyValue = (
-    propertyMetadata: EntityProperty,
+    propertyMetadata: EntityPropertyMetadata,
     value: unknown
   ): unknown => {
     if (
