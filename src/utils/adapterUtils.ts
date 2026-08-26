@@ -64,7 +64,7 @@ export interface AdapterUtils {
    *
    * @param metadata - Name of the entity
    * @param output - Result of a Mikro ORM query
-   * @param select - A list of fields to return
+   * @param select - List of fields to return
    */
   normalizeOutput(
     metadata: EntityMetadata,
@@ -76,7 +76,7 @@ export interface AdapterUtils {
    * Transforms given list of Where clauses for Mikro ORM.
    *
    * @param metadata - Entity name
-   * @param where - A list of where clauses to normalize
+   * @param where - List of where clauses to normalize
    */
   normalizeWhereClauses(
     metadata: EntityMetadata,
