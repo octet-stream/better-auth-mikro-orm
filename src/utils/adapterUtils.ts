@@ -217,38 +217,24 @@ export function createAdapterUtils(
     )
   }
 
-  /**
-   * Normalizes property's raw input value: if property is a reference,
-   * then it wraps value using [`orm.em.getReference`](https://mikro-orm.io/docs/entity-manager#entity-references) method,
-   * to unsure it's correctly persisted.
-   *
-   * Otherwise the value is returned as is.
-   *
-   * @param property - Metadata of the property
-   * @param value - Raw input value
-   */
-  const normalizePropertyValue = (
-    propertyMetadata: EntityPropertyMetadata,
-    value: unknown
-  ): unknown => {
-    if (
-      !propertyMetadata.targetMeta ||
-      propertyMetadata.kind === ReferenceKind.SCALAR ||
-      propertyMetadata.kind === ReferenceKind.EMBEDDED
-    ) {
-      return value
-    }
-
-    return orm.em.getReference(propertyMetadata.targetMeta.class, value)
-  }
-
   const normalizeInput: AdapterUtils["normalizeInput"] = (metadata, input) => {
     const fields: Record<string, any> = {}
+
     Object.entries(input).forEach(([key, value]) => {
       const propertyMetadata = getEntityPropertyMetadata(metadata, key)
-      const normalizedValue = normalizePropertyValue(propertyMetadata, value)
+      const targetEntityMetadata = propertyMetadata.targetMeta
+      const isReference =
+        targetEntityMetadata &&
+        propertyMetadata.kind !== ReferenceKind.SCALAR &&
+        propertyMetadata.kind !== ReferenceKind.EMBEDDED
 
-      dset(fields, [propertyMetadata.name], normalizedValue)
+      dset(
+        fields,
+        [propertyMetadata.name],
+        isReference
+          ? orm.em.getReference(targetEntityMetadata.class, value)
+          : value
+      )
     })
 
     return fields
