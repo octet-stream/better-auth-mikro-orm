@@ -163,10 +163,10 @@ export function createAdapterUtils(
    * @param entityName - The name of the entity
    * @param prop - Property metadata
    */
-  function getReferencedColumnName(
-    entityName: string,
+  const getEntityPropertyName = (
+    metadata: EntityMetadata,
     propertyMetadata: EntityPropertyMetadata
-  ) {
+  ) => {
     if (selfNamedReferenceKinds.includes(propertyMetadata.kind)) {
       return propertyMetadata.name
     }
@@ -178,20 +178,9 @@ export function createAdapterUtils(
     }
 
     createAdapterError(
-      `Reference kind ${propertyMetadata.kind} is not supported. Defined in "${entityName}" entity for "${propertyMetadata.name}" field.`
+      `Reference kind ${propertyMetadata.kind} is not supported. Defined in "${metadata.className}" entity for "${propertyMetadata.name}" field.`
     )
   }
-
-  /**
-   * Returns referenced _property_ name in camelCase.
-   *
-   * @param entityName - The name of the entity
-   * @param prop - Property metadata
-   */
-  const getEntityPropertyName = (
-    metadata: EntityMetadata,
-    propertyMetadata: EntityPropertyMetadata
-  ) => getReferencedColumnName(metadata.className, propertyMetadata)
 
   const getFieldPath: AdapterUtils["getFieldPath"] = (
     metadata,
