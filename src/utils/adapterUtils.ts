@@ -86,7 +86,7 @@ export interface AdapterUtils {
   normalizeSelect(modelName: string, input?: string[]): string[] | undefined
 }
 
-const ownReferences = [
+const selfNamedReferenceKinds = [
   ReferenceKind.SCALAR,
   ReferenceKind.ONE_TO_MANY,
   ReferenceKind.EMBEDDED
@@ -132,7 +132,10 @@ export function createAdapterUtils(
     fieldName: string
   ): EntityProperty {
     const prop = metadata.props.find(prop => {
-      if (ownReferences.includes(prop.kind) && prop.name === fieldName) {
+      if (
+        selfNamedReferenceKinds.includes(prop.kind) &&
+        prop.name === fieldName
+      ) {
         return true
       }
 
@@ -165,7 +168,7 @@ export function createAdapterUtils(
    * @param prop - Property metadata
    */
   function getReferencedColumnName(entityName: string, prop: EntityProperty) {
-    if (ownReferences.includes(prop.kind)) {
+    if (selfNamedReferenceKinds.includes(prop.kind)) {
       return prop.name
     }
 
