@@ -21,13 +21,6 @@ function throwUnhandledWhereOperator(op: never): never {
 
 export interface AdapterUtils {
   /**
-   * Normalizes given model `name` for Mikro ORM using [naming strategy](https://mikro-orm.io/docs/naming-strategy) defined by the config.
-   *
-   * @param name - The name of the entity
-   */
-  normalizeEntityName(name: string): string
-
-  /**
    * Returns metadata for given `entityName` from MetadataStorage.
    *
    * @param entityName - The name of the entity to get the metadata for
@@ -107,14 +100,13 @@ export function createAdapterUtils(
 ): AdapterUtils {
   const namingStrategy = orm.config.getNamingStrategy()
 
-  const normalizeEntityName: AdapterUtils["normalizeEntityName"] = name =>
-    namingStrategy.getEntityName(namingStrategy.classToTableName(name))
-
   const getEntityMetadata: AdapterUtils["getEntityMetadata"] = (
     entityName: string
   ) => {
     const ormMetadata = orm.getMetadata()
-    const normalizedEntityName = normalizeEntityName(entityName)
+    const normalizedEntityName = namingStrategy.getEntityName(
+      namingStrategy.classToTableName(entityName)
+    )
 
     if (!ormMetadata.has(normalizedEntityName)) {
       createAdapterError(
@@ -442,7 +434,6 @@ export function createAdapterUtils(
 
   return {
     getEntityMetadata,
-    normalizeEntityName,
     getFieldPath,
     normalizeInput,
     normalizeOutput,
