@@ -73,10 +73,10 @@ export interface AdapterUtils {
   ): Record<string, any>
 
   /**
-   * Transforms given list of Where clause(s) for Mikro ORM.
+   * Transforms given list of Where clauses for Mikro ORM.
    *
    * @param metadata - Entity name
-   * @param where - A list where clause(s) to normalize
+   * @param where - A list of where clauses to normalize
    */
   normalizeWhereClauses(
     metadata: EntityMetadata,
