@@ -30,14 +30,17 @@ export interface AdapterUtils {
   getEntityMetadata(name: string): EntityMetadata
 
   /**
-   * Returns a path to a `field` reference.
+   * Resolves a Better Auth field name into a MikroORM property path
    *
-   * @param entityName - The name of the entity
-   * @param fieldName - The field's name
-   * @param throwOnShadowProps - Whether or throw error for Shadow Props. Use it for where clause so Mikro ORM will not throw when accessing such props from database.
+   * @param metadata - Entity metadata that owns the field
+   * @param fieldName - Better Auth field name to resolve
+   * @param throwOnShadowProps - When `true`, throws if the field is not persisted
+   * and therefore cannot be used in database queries
    *
-   * @throws BetterAuthError when no such field exist on the `entity`
-   * @throws BetterAuthError if complex primary key is discovered in `fieldName` relation
+   * @throws BetterAuthError If the field does not exist on the entity
+   * @throws BetterAuthError If the field is not persisted and `throwOnShadowProps` is `true`
+   * @throws BetterAuthError If the field references a relation with a composite primary key
+   * @throws BetterAuthError If the field kind cannot be represented as a MikroORM path
    */
   getFieldPath(
     metadata: EntityMetadata,
