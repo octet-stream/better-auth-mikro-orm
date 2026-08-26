@@ -158,7 +158,7 @@ export function createAdapterUtils(
   }
 
   /**
-   * Returns referenced _column_ name for given `prop` using [naming strategy](https://mikro-orm.io/docs/naming-strategy) defined by the config.
+   * Returns entity property name for given entity metadata
    *
    * @param metadata - Entity metadata
    * @param propertyMetadata - Property metadata
