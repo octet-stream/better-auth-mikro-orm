@@ -135,17 +135,13 @@ export function createAdapterUtils(
         return true
       }
 
-      if (
+      return (
         propertyMetadata.kind === ReferenceKind.MANY_TO_ONE &&
         (propertyMetadata.name === fieldName ||
           propertyMetadata.fieldNames.includes(
             namingStrategy.propertyToColumnName(fieldName)
           ))
-      ) {
-        return true
-      }
-
-      return false
+      )
     })
 
     if (!propertyMetadata) {
