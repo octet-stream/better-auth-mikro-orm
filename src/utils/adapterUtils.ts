@@ -127,7 +127,7 @@ export function createAdapterUtils(
    * @param metadata - Entity metadata
    * @param fieldName - The name of the field to get metadata for
    */
-  function getPropertyMetadata(
+  function getEntityPropertyMetadata(
     metadata: EntityMetadata,
     fieldName: string
   ): EntityProperty {
@@ -196,7 +196,7 @@ export function createAdapterUtils(
     fieldName,
     throwOnShadowProps = false
   ) => {
-    const prop = getPropertyMetadata(metadata, fieldName)
+    const prop = getEntityPropertyMetadata(metadata, fieldName)
 
     if (prop.persist === false && throwOnShadowProps) {
       createAdapterError(
@@ -254,7 +254,7 @@ export function createAdapterUtils(
   const normalizeInput: AdapterUtils["normalizeInput"] = (metadata, input) => {
     const fields: Record<string, any> = {}
     Object.entries(input).forEach(([key, value]) => {
-      const property = getPropertyMetadata(metadata, key)
+      const property = getEntityPropertyMetadata(metadata, key)
       const normalizedValue = normalizePropertyValue(property, value)
 
       dset(fields, [property.name], normalizedValue)
@@ -275,7 +275,7 @@ export function createAdapterUtils(
       .map(([key, value]) => ({
         path: getReferencedPropertyName(
           metadata,
-          getPropertyMetadata(metadata, key)
+          getEntityPropertyMetadata(metadata, key)
         ),
         value
       }))
