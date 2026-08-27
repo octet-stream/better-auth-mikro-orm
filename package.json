@@ -2,7 +2,7 @@
   "private": false,
   "type": "module",
   "name": "@forklaunch/better-auth-mikro-orm-fork",
-  "version": "0.5.7",
+  "version": "0.5.8",
   "description": "Mikro ORM Adapter for Better Auth",
   "keywords": [
     "auth",
@@ -57,7 +57,7 @@
     "prepare": "npx --yes is-in-ci || husky"
   },
   "devDependencies": {
-    "@better-auth/test-utils": "1.5.5",
+    "@better-auth/test-utils": "1.6.27",
     "@biomejs/biome": "2.4.7",
     "@changesets/changelog-github": "0.6.0",
     "@changesets/cli": "2.30.0",
@@ -71,7 +71,7 @@
     "@types/uuid": "11.0.0",
     "@vitest/coverage-v8": "4.1.0",
     "@vitest/ui": "4.1.0",
-    "better-auth": "1.5.5",
+    "better-auth": "1.6.27",
     "del-cli": "7.0.0",
     "es-toolkit": "1.45.1",
     "husky": "9.1.7",

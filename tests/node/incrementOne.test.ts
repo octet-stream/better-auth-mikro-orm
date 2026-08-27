@@ -6,11 +6,32 @@ import {createOrm} from "../fixtures/orm.js"
 
 const orm = createOrm({entities: [DeviceCode]})
 
+// `deviceCode` is not a core Better Auth model — it arrives with the
+// device-authorization plugin, and the adapter factory rejects any model that
+// is absent from the resolved schema. Declaring it through a minimal plugin is
+// what makes the factory dispatch `incrementOne` for this model at all, and it
+// mirrors how the real flow reaches the adapter in production.
 const adapter = mikroOrmAdapter(orm, {
   debugLogs: {
     isRunningAdapterTests: true
   }
-})({})
+})({
+  plugins: [
+    {
+      id: "device-authorization-test",
+      schema: {
+        deviceCode: {
+          fields: {
+            userCode: {type: "string", required: true},
+            status: {type: "string", required: true},
+            userId: {type: "string", required: false},
+            attempts: {type: "number", required: false}
+          }
+        }
+      }
+    }
+  ]
+} as never)
 
 /**
  * `incrementOne` is a guarded conditional update, not merely a counter bump.
