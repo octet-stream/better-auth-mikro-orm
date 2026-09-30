@@ -1,8 +1,8 @@
-import type {MikroORM} from "@mikro-orm/core"
+import {type MikroORM, RequestContext} from "@mikro-orm/core"
 import type {BetterAuthPlugin} from "better-auth"
 import {generateId} from "better-auth"
 import {deviceAuthorization} from "better-auth/plugins"
-import {expect, suite, test} from "vitest"
+import {afterEach, beforeEach, expect, suite, test} from "vitest"
 
 import {mikroOrmAdapter} from "../../src/adapter.ts"
 import * as entities from "../fixtures/entities/atomic.ts"
@@ -532,6 +532,143 @@ export function defineAtomicSuite(getOrm: () => MikroORM) {
 
       expect(results.filter(row => row !== null)).toHaveLength(1)
       await expect(findCounter(counter.id)).resolves.toBeNull()
+    })
+  })
+
+  // MikroORM's default is `allowGlobalContext: false`: outside a `RequestContext`, using `orm.em` directly throws.
+  // Better Auth may call `consumeOne` / `incrementOne` outside a request context (e.g. background jobs), and both
+  // methods commit before touching the caller's Identity Map, so a throw there would lose the consumed row.
+  suite("without a request context and allowGlobalContext: false", () => {
+    let previous: boolean
+
+    // Seeds and reads rows inside a request context, so only the call under test runs without one.
+    const inContext = <T>(fn: () => Promise<T>) =>
+      RequestContext.create(getOrm().em, fn)
+
+    beforeEach(() => {
+      const {config} = getOrm()
+
+      previous = config.get("allowGlobalContext")
+      config.set("allowGlobalContext", false)
+    })
+
+    afterEach(() => {
+      getOrm().config.set("allowGlobalContext", previous)
+    })
+
+    test("the global context is really rejected", () => {
+      expect(() => getOrm().em.getUnitOfWork()).toThrow(/global EntityManager/)
+    })
+
+    test("consumeOne consumes the row exactly once without throwing", async () => {
+      const adapter = getAdapter()
+      const deviceCode = await inContext(createDeviceCode)
+      const where = [
+        {field: "deviceCode", value: deviceCode.deviceCode},
+        {field: "status", value: "pending"}
+      ]
+
+      const first = await adapter.consumeOne<DeviceCodeRow>({
+        model: "deviceCode",
+        where
+      })
+
+      expect(first).toMatchObject({
+        id: deviceCode.id,
+        deviceCode: deviceCode.deviceCode
+      })
+
+      await expect(
+        adapter.consumeOne({model: "deviceCode", where})
+      ).resolves.toBeNull()
+
+      await expect(
+        inContext(() =>
+          adapter.count({
+            model: "deviceCode",
+            where: [{field: "id", value: deviceCode.id}]
+          })
+        )
+      ).resolves.toBe(0)
+    })
+
+    test("incrementOne claims and increments without throwing", async () => {
+      const adapter = getAdapter()
+      const user = await inContext(createUser)
+      const deviceCode = await inContext(createDeviceCode)
+      const counter = await inContext(() => createCounter({value: 1}))
+
+      const claimWhere = [
+        {field: "id", value: deviceCode.id},
+        {field: "status", value: "pending"},
+        {field: "userId", value: null}
+      ]
+
+      await expect(
+        adapter.incrementOne<DeviceCodeRow>({
+          model: "deviceCode",
+          where: claimWhere,
+          increment: {},
+          set: {userId: user.id}
+        })
+      ).resolves.toMatchObject({id: deviceCode.id, userId: user.id})
+
+      await expect(
+        adapter.incrementOne({
+          model: "deviceCode",
+          where: claimWhere,
+          increment: {},
+          set: {userId: user.id}
+        })
+      ).resolves.toBeNull()
+
+      await expect(
+        adapter.incrementOne<CounterRow>({
+          model: "counter",
+          where: [{field: "id", value: counter.id}],
+          increment: {value: 2}
+        })
+      ).resolves.toMatchObject({id: counter.id, value: 3})
+
+      await expect(
+        inContext(() => findCounter(counter.id))
+      ).resolves.toMatchObject({value: 3})
+    })
+
+    test("incrementOne sets a reference field without throwing", async () => {
+      const adapter = getAdapter()
+      const owner = await inContext(createUser)
+      const counter = await inContext(() => createCounter({value: 1}))
+
+      await expect(
+        adapter.incrementOne<CounterRow>({
+          model: "counter",
+          where: [{field: "id", value: counter.id}],
+          increment: {value: 1},
+          set: {ownerId: owner.id}
+        })
+      ).resolves.toMatchObject({id: counter.id, value: 2, ownerId: owner.id})
+
+      await expect(
+        inContext(() => findCounter(counter.id))
+      ).resolves.toMatchObject({value: 2, ownerId: owner.id})
+    })
+
+    test("concurrent consumers get the row exactly once", async () => {
+      const adapter = getAdapter()
+      const counter = await inContext(() => createCounter())
+
+      const results = await Promise.all(
+        Array.from({length: 10}, () =>
+          adapter.consumeOne({
+            model: "counter",
+            where: [{field: "id", value: counter.id}]
+          })
+        )
+      )
+
+      expect(results.filter(row => row !== null)).toHaveLength(1)
+      await expect(inContext(() => findCounter(counter.id))).resolves.toBeNull()
     })
   })
 }

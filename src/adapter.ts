@@ -90,12 +90,17 @@ export const mikroOrmAdapter = (
       /**
        * Removes an entity from the identity map of the current context (request-scoped EntityManager, if any),
        * so the stale copy is not served to subsequent reads by primary key after a native delete.
+       *
+       * Must never throw: it runs after the delete has been committed, so a throw would lose the consumed row.
+       * `getContext(false)` skips the `allowGlobalContext` check (MikroORM's default forbids the global context),
+       * and `getUnitOfWork(false)` reads that resolved EntityManager's own unit of work without validating again.
+       * Without a request context this touches the global identity map, which is harmless: evicting is always safe.
        */
       function evictFromIdentityMap(
         metadata: EntityMetadata,
         primaryKey: unknown
       ): void {
-        const uow = orm.em.getUnitOfWork()
+        const uow = orm.em.getContext(false).getUnitOfWork(false)
         const entity = uow.getById(metadata.class, primaryKey as any)
 
         if (entity) {
@@ -254,7 +259,7 @@ export const mikroOrmAdapter = (
               const output = normalizeOutput(metadata, entity)
 
               // Detach from the fork so the transaction does not merge the deleted row back into the parent context
-              em.getUnitOfWork().unsetIdentity(entity)
+              em.getUnitOfWork(false).unsetIdentity(entity)
 
               const affected = await em.nativeDelete(metadata.class, {
                 $and: [filter, {[primaryKeyName]: primaryKey}]
@@ -293,7 +298,12 @@ export const mikroOrmAdapter = (
           const metadata = getEntityMetadata(model)
           const primaryKeyName = getPrimaryKeyName(metadata)
           const filter = normalizeWhereClauses(metadata, where)
-          const data = set ? normalizeInput(metadata, set) : {}
+          const setProperties = new Set(
+            Object.keys(set ?? {}).map(
+              field => getPropertyMetadata(metadata, field).name
+            )
+          )
+          const increments: Record<string, unknown> = {}
 
           for (const [field, delta] of Object.entries(increment)) {
             if (typeof delta !== "number" || !Number.isFinite(delta)) {
@@ -311,16 +321,22 @@ export const mikroOrmAdapter = (
               )
             }
 
-            if (property.name in data) {
+            if (setProperties.has(property.name)) {
               createAdapterError(
                 `The "${field}" field cannot be both incremented and set in the same operation.`
               )
             }
 
-            data[property.name] = raw("coalesce(??, 0) + ?", [column, delta])
+            increments[property.name] = raw("coalesce(??, 0) + ?", [
+              column,
+              delta
+            ])
           }
 
-          if (Object.keys(data).length === 0) {
+          if (
+            setProperties.size === 0 &&
+            Object.keys(increments).length === 0
+          ) {
             createAdapterError(
               "incrementOne requires at least one field to increment or set."
             )
@@ -339,6 +355,13 @@ export const mikroOrmAdapter = (
               const primaryKey = (entity as Record<string, unknown>)[
                 primaryKeyName
               ]
+
+              // References in `set` are created on the transaction's fork: `orm.em` would reject the global context
+              // when there is no request context and `allowGlobalContext` is disabled (MikroORM's default).
+              const data = {
+                ...(set ? normalizeInput(metadata, set, em) : {}),
+                ...increments
+              }
 
               const affected = await em.nativeUpdate(
                 metadata.class,
