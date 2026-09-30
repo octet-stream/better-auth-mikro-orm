@@ -33,6 +33,19 @@ export interface AdapterUtils {
   getEntityMetadata(name: string): EntityMetadata
 
   /**
+   * Returns metadata for a property by given `fieldName`.
+   *
+   * @param metadata - Entity metadata
+   * @param fieldName - The name of the field to get metadata for
+   *
+   * @throws BetterAuthError when no such field exist on the entity
+   */
+  getPropertyMetadata(
+    metadata: EntityMetadata,
+    fieldName: string
+  ): EntityProperty
+
+  /**
    * Returns a path to a `field` reference.
    *
    * @param entityName - The name of the entity
@@ -237,6 +250,7 @@ export function createAdapterUtils(
     value: unknown
   ): unknown => {
     if (
+      value == null ||
       !property.targetMeta ||
       property.kind === ReferenceKind.SCALAR ||
       property.kind === ReferenceKind.EMBEDDED
@@ -428,6 +442,7 @@ export function createAdapterUtils(
 
   return {
     getEntityMetadata,
+    getPropertyMetadata,
     normalizeEntityName,
     getFieldPath,
     normalizeInput,

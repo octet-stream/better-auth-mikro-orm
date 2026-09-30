@@ -1,4 +1,12 @@
-import type {FindOptions, MikroORM} from "@mikro-orm/core"
+import {
+  type EntityManager,
+  type EntityMetadata,
+  type FindOptions,
+  LockMode,
+  type MikroORM,
+  ReferenceKind,
+  raw
+} from "@mikro-orm/core"
 import {
   createAdapterFactory,
   type DBAdapterDebugLogOption
@@ -6,6 +14,7 @@ import {
 import {dset} from "dset"
 
 import {createAdapterUtils} from "./utils/adapterUtils.ts"
+import {createAdapterError} from "./utils/createAdapterError.ts"
 
 export interface MikroOrmAdapterConfig {
   /**
@@ -54,12 +63,45 @@ export const mikroOrmAdapter = (
     adapter(config) {
       const {
         getEntityMetadata,
+        getPropertyMetadata,
         getFieldPath,
         normalizeInput,
         normalizeOutput,
         normalizeWhereClauses,
         normalizeSelect
       } = createAdapterUtils(orm, config)
+
+      /**
+       * Returns the primary key property name of the entity.
+       * Composite primary keys are not supported by this adapter.
+       */
+      function getPrimaryKeyName(metadata: EntityMetadata): string {
+        const [primaryKey, ...rest] = metadata.primaryKeys
+
+        if (!primaryKey || rest.length > 0) {
+          createAdapterError(
+            `Entity "${metadata.className}" must have exactly one primary key to be used with atomic operations.`
+          )
+        }
+
+        return primaryKey
+      }
+
+      /**
+       * Removes an entity from the identity map of the current context (request-scoped EntityManager, if any),
+       * so the stale copy is not served to subsequent reads by primary key after a native delete.
+       */
+      function evictFromIdentityMap(
+        metadata: EntityMetadata,
+        primaryKey: unknown
+      ): void {
+        const uow = orm.em.getUnitOfWork()
+        const entity = uow.getById(metadata.class, primaryKey as any)
+
+        if (entity) {
+          uow.unsetIdentity(entity)
+        }
+      }
 
       return {
         async create({model, data, select}) {
@@ -178,6 +220,142 @@ export const mikroOrmAdapter = (
           if (entity) {
             await orm.em.remove(entity).flush()
           }
+        },
+
+        /**
+         * Atomically deletes a single row matching the `where` clause and returns it.
+         *
+         * Runs in its own transaction on a fresh fork of the current EntityManager:
+         *   1. `SELECT ... LIMIT 1 FOR UPDATE` picks one matching row and locks it
+         *      (dialects without row locks, such as SQLite, serialize write transactions instead).
+         *   2. `DELETE ... WHERE <where> AND <pk> = ?` re-checks the guard in the same statement,
+         *      so exactly one concurrent caller sees an affected row count of 1 and wins the row.
+         *
+         * At most one row is deleted, even if the predicate is not unique.
+         */
+        async consumeOne({model, where}) {
+          const metadata = getEntityMetadata(model)
+          const primaryKeyName = getPrimaryKeyName(metadata)
+          const filter = normalizeWhereClauses(metadata, where)
+
+          const consumed = await orm.em.transactional(
+            async (em: EntityManager) => {
+              const entity = await em.findOne(metadata.class, filter, {
+                lockMode: LockMode.PESSIMISTIC_WRITE
+              })
+
+              if (!entity) {
+                return null
+              }
+
+              const primaryKey = (entity as Record<string, unknown>)[
+                primaryKeyName
+              ]
+              const output = normalizeOutput(metadata, entity)
+
+              // Detach from the fork so the transaction does not merge the deleted row back into the parent context
+              em.getUnitOfWork().unsetIdentity(entity)
+
+              const affected = await em.nativeDelete(metadata.class, {
+                $and: [filter, {[primaryKeyName]: primaryKey}]
+              })
+
+              return affected === 1 ? {output, primaryKey} : null
+            },
+            {clear: true}
+          )
+
+          if (!consumed) {
+            return null
+          }
+
+          evictFromIdentityMap(metadata, consumed.primaryKey)
+
+          return consumed.output as any
+        },
+
+        /**
+         * Atomically applies `increment` deltas and `set` assignments to a single row matching the `where` clause.
+         * The `where` clause is both the selector and the guard.
+         *
+         * Runs in its own transaction on a fresh fork of the current EntityManager:
+         *   1. `SELECT ... LIMIT 1 FOR UPDATE` picks one matching row and locks it
+         *      (dialects without row locks, such as SQLite, serialize write transactions instead).
+         *   2. `UPDATE ... SET field = coalesce(field, 0) + ?, <set> WHERE <where> AND <pk> = ?`
+         *      computes the increments in SQL and re-checks the guard in the same statement,
+         *      so concurrent increments never lose updates and a guard miss changes nothing.
+         *   3. The updated row is re-read inside the same transaction (the row lock is still held),
+         *      and merged back into the caller's identity map when the transaction commits.
+         *
+         * Both `increment` and `set` are applied by the same `UPDATE` statement.
+         */
+        async incrementOne({model, where, increment, set}) {
+          const metadata = getEntityMetadata(model)
+          const primaryKeyName = getPrimaryKeyName(metadata)
+          const filter = normalizeWhereClauses(metadata, where)
+          const data = set ? normalizeInput(metadata, set) : {}
+
+          for (const [field, delta] of Object.entries(increment)) {
+            if (typeof delta !== "number" || !Number.isFinite(delta)) {
+              createAdapterError(
+                `The increment for "${field}" field must be a finite number.`
+              )
+            }
+
+            const property = getPropertyMetadata(metadata, field)
+            const [column] = property.fieldNames
+
+            if (property.kind !== ReferenceKind.SCALAR || !column) {
+              createAdapterError(
+                `Cannot increment "${field}" field on "${metadata.className}" entity, because it is not a scalar column.`
+              )
+            }
+
+            if (property.name in data) {
+              createAdapterError(
+                `The "${field}" field cannot be both incremented and set in the same operation.`
+              )
+            }
+
+            data[property.name] = raw("coalesce(??, 0) + ?", [column, delta])
+          }
+
+          if (Object.keys(data).length === 0) {
+            createAdapterError(
+              "incrementOne requires at least one field to increment or set."
+            )
+          }
+
+          return orm.em.transactional(
+            async (em: EntityManager) => {
+              const entity = await em.findOne(metadata.class, filter, {
+                lockMode: LockMode.PESSIMISTIC_WRITE
+              })
+
+              if (!entity) {
+                return null
+              }
+
+              const primaryKey = (entity as Record<string, unknown>)[
+                primaryKeyName
+              ]
+
+              const affected = await em.nativeUpdate(
+                metadata.class,
+                {$and: [filter, {[primaryKeyName]: primaryKey}]},
+                data
+              )
+
+              if (affected !== 1) {
+                return null
+              }
+
+              await em.refresh(entity)
+
+              return normalizeOutput(metadata, entity) as any
+            },
+            {clear: true}
+          )
         },
 
         async deleteMany({model, where}) {
