@@ -45,7 +45,7 @@
     "prepare": "npx --yes is-in-ci || husky"
   },
   "devDependencies": {
-    "@better-auth/test-utils": "1.6.9",
+    "@better-auth/test-utils": "1.7.7",
     "@biomejs/biome": "2.4.13",
     "@changesets/changelog-github": "0.6.0",
     "@changesets/cli": "2.31.0",
@@ -55,11 +55,12 @@
     "@faker-js/faker": "10.4.0",
     "@mikro-orm/core": "7.0.12",
     "@mikro-orm/decorators": "7.0.12",
+    "@mikro-orm/postgresql": "7.0.12",
     "@mikro-orm/sqlite": "7.0.12",
     "@types/node": "25.6.0",
     "@vitest/coverage-v8": "4.1.5",
     "@vitest/ui": "4.1.5",
-    "better-auth": "1.6.9",
+    "better-auth": "1.7.7",
     "del-cli": "7.0.0",
     "es-toolkit": "1.46.0",
     "husky": "9.1.7",

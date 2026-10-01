@@ -1,4 +1,9 @@
-import type {EntityMetadata, EntityProperty, MikroORM} from "@mikro-orm/core"
+import type {
+  EntityManager,
+  EntityMetadata,
+  EntityProperty,
+  MikroORM
+} from "@mikro-orm/core"
 import {ReferenceKind, serialize} from "@mikro-orm/core"
 import type {Where} from "better-auth"
 import type {AdapterFactoryCustomizeAdapterCreator} from "better-auth/adapters"
@@ -33,6 +38,19 @@ export interface AdapterUtils {
   getEntityMetadata(name: string): EntityMetadata
 
   /**
+   * Returns metadata for a property by given `fieldName`.
+   *
+   * @param metadata - Entity metadata
+   * @param fieldName - The name of the field to get metadata for
+   *
+   * @throws BetterAuthError when no such field exist on the entity
+   */
+  getPropertyMetadata(
+    metadata: EntityMetadata,
+    fieldName: string
+  ): EntityProperty
+
+  /**
    * Returns a path to a `field` reference.
    *
    * @param entityName - The name of the entity
@@ -53,10 +71,12 @@ export interface AdapterUtils {
    *
    * @param entityName - The name of the entity
    * @param input - The data to normalize
+   * @param em - EntityManager used to create references. Defaults to the current context of `orm.em`
    */
   normalizeInput(
     metadata: EntityMetadata,
-    input: Record<string, any>
+    input: Record<string, any>,
+    em?: EntityManager
   ): Record<string, any>
 
   /**
@@ -231,12 +251,15 @@ export function createAdapterUtils(
    *
    * @param property - Metadata of the property
    * @param value - Raw input value
+   * @param em - EntityManager used to create the reference
    */
   const normalizePropertyValue = (
     property: EntityProperty,
-    value: unknown
+    value: unknown,
+    em: EntityManager
   ): unknown => {
     if (
+      value == null ||
       !property.targetMeta ||
       property.kind === ReferenceKind.SCALAR ||
       property.kind === ReferenceKind.EMBEDDED
@@ -244,14 +267,18 @@ export function createAdapterUtils(
       return value
     }
 
-    return orm.em.getReference(property.targetMeta.class, value)
+    return em.getReference(property.targetMeta.class, value)
   }
 
-  const normalizeInput: AdapterUtils["normalizeInput"] = (metadata, input) => {
+  const normalizeInput: AdapterUtils["normalizeInput"] = (
+    metadata,
+    input,
+    em = orm.em
+  ) => {
     const fields: Record<string, any> = {}
     Object.entries(input).forEach(([key, value]) => {
       const property = getPropertyMetadata(metadata, key)
-      const normalizedValue = normalizePropertyValue(property, value)
+      const normalizedValue = normalizePropertyValue(property, value, em)
 
       dset(fields, [property.name], normalizedValue)
     })
@@ -428,6 +455,7 @@ export function createAdapterUtils(
 
   return {
     getEntityMetadata,
+    getPropertyMetadata,
     normalizeEntityName,
     getFieldPath,
     normalizeInput,
